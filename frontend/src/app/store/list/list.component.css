@@ -1,0 +1,28 @@
+
+.card img {
+    min-width:100% !important;
+}
+
+/* ratings */
+
+.star-rating {
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    flex-direction: row-reverse;
+    padding: 0;
+    justify-content: space-around;
+    list-style-type: none;
+    text-align: center;
+    margin-top:5px;
+    /* margin-bottom: 5px; */
+} 
+
+.star-rating .small-star {
+    color:#ccc;
+    font-size: 1em !important;
+}
+
+.star-rating .rated-star {
+    color: #fcd27b;
+}

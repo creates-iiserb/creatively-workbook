@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Workbook subscription</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <br><br>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
+                <div class="card">
+                    <img src="<%-wbDets['img']%>" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title"><%-wbDets['title']%></h5>
+                        <p class="card-text">
+                            By <span class="text-muted"><%-wbDets['publisher']['name']%></span> 
+                            <!-- <ul>
+                                <li>Full access to workbook</li>
+                                <li>Ability to reset worksheets</li>
+                                <li>Ability to modify worksheet duration</li>
+                            </ul> -->
+                        </p>
+                        <hr>
+
+                        <% if (failedTxn['status']==true){%>
+                            <div class="alert alert-danger">
+                                Your last transaction failed. 
+                                If the amount was deducted from your account and subscription status is not updated, contact us at <%-supportEmail%>. 
+                                <br> 
+                                Mention the order Id <b><%-failedTxn['data']['value']['orderId']%></b>.
+                                <br>
+                                <br>
+                                If the amount was not deducted, you can try again.
+                            </div>
+                        <%}%>    
+
+                        <p>Your current subscription type is <b><%-subExists['curSubr']['type']%></b>
+                            <br>
+                            <%if(subExists['validity']['validity']){%>
+                            Validity : &nbsp; <code><%-subExists['validity']['startDate']%></code> -  <code> <%-subExists['validity']['endDate']%></code> <br>
+                            (<%-subExists['curSubr']['period']%> days)
+                            <%}else{%>
+                                <div class="alert alert-warning">Your subscription period is over.</div>
+                            <%}%>
+                        </p>
+                        <hr>
+
+
+
+                        <% if(subExists['curSubr']['type']=='free'){ %>
+
+
+
+                        
+                        <form action="<%-redirectUrl%>" method="POST" enctype="application/json">
+                            <input type="hidden" name="subId" id="subId" value="<%-subExists['_id']%>">
+                            <input type="hidden" name="auth" id="auth" value="<%-authTk%>">
+                            <input type="hidden" name="wbuser" id="wbuser" value="<%-wbuser%>">
+                            <input type="hidden" name="mode" id="mode" value="paid">
+
+
+                            <% if (failedTxn['status']==true){%>
+                                <input type="hidden" name="retry" id="retry" value="yes">
+                            <%}else{%>  
+                                <input type="hidden" name="retry" id="retry" value="no">
+                            <%}%>
+                            
+                            Select a payment gateway:
+
+                            <fieldset id="gateway">
+                                <%  for(let a = 0; a < pGateWays.length; a++) { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gateway"
+                                        id="<%-pGateWays[a]['name']%>" value="<%-pGateWays[a]['name']%>"
+                                        <%= pGateWays[a].default? ' checked ' :'' %>>
+                                    <label class="form-check-label" for="<%-pGateWays[a]['name']%>">
+                                        <%-pGateWays[a]['title']%>
+                                    </label>
+                                </div>
+                                <%}%>
+                            </fieldset>
+                        <br>
+                        <button class="btn btn-primary" type="submit">Subscribe for <%-wbDets['pricing']['currency']%>
+                                <%-wbDets['pricing']['price']%> for <%-wbDets['pricing']['period']%> days</button>
+                        </form>
+
+
+
+
+
+
+                        <% if (subExists['validity']['earlyRenewal'] ==true || subExists['validity']['validity']==false ){%>
+                            <hr>
+                            <br>
+                        <form action="<%-redirectUrl%>" method="POST" enctype="application/json">
+                            <button class="btn btn-link text-center" type="submit">Continue with free subscription for
+                                <%-wbDets['pricing']['period']%> days</button>
+                            <input type="hidden" name="subId" id="subId" value="<%-subExists['_id']%>">
+                            <input type="hidden" name="auth" id="auth" value="<%-authTk%>">
+                            <input type="hidden" name="wbuser" id="wbuser" value="<%-wbuser%>">
+                            <input type="hidden" name="mode" id="mode" value="free">
+
+                            <% if (failedTxn['status']==true){%>
+                                <input type="hidden" name="retry" id="retry" value="yes">
+                            <%}else{%>  
+                                <input type="hidden" name="retry" id="retry" value="no">
+                            <%}%>
+                        </form>
+
+                        <%}%>
+
+                        
+                     
+
+                    <%}else if(subExists['curSubr']['type']=='paid'){%>
+                        <% if (subExists['validity']['validity']==false){%>
+
+                            <form action="<%-redirectUrl%>" method="POST" enctype="application/json">
+                                <input type="hidden" name="subId" id="subId" value="<%-subExists['_id']%>">
+                                <input type="hidden" name="auth" id="auth" value="<%-authTk%>">
+                                <input type="hidden" name="wbuser" id="wbuser" value="<%-wbuser%>">
+                                <input type="hidden" name="mode" id="mode" value="paid">
+                                <input type="hidden" name="retry" id="retry" value="no">
+                                Select a payment gateway:
+    
+                                <fieldset id="gateway">
+                                    <%  for(let a = 0; a < pGateWays.length; a++) { %>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="gateway"
+                                            id="<%-pGateWays[a]['name']%>" value="<%-pGateWays[a]['name']%>"
+                                            <%= pGateWays[a].default? ' checked ' :'' %>>
+                                        <label class="form-check-label" for="<%-pGateWays[a]['name']%>">
+                                            <%-pGateWays[a]['title']%>
+                                        </label>
+                                    </div>
+                                    <%}%>
+                                </fieldset>
+                            <br>
+                            <button class="btn btn-primary" type="submit">Subscribe for <%-wbDets['pricing']['currency']%>
+                                    <%-wbDets['pricing']['price']%> for <%-wbDets['pricing']['period']%> days</button>
+                            </form>
+
+
+                            <hr>
+                            <br>
+                        <form action="<%-redirectUrl%>" method="POST" enctype="application/json">
+                            <button class="btn btn-link text-center" type="submit">Continue with free subscription for
+                                <%-wbDets['pricing']['period']%> days</button>
+                            <input type="hidden" name="subId" id="subId" value="<%-subExists['_id']%>">
+                            <input type="hidden" name="auth" id="auth" value="<%-authTk%>">
+                            <input type="hidden" name="wbuser" id="wbuser" value="<%-wbuser%>">
+                            <input type="hidden" name="mode" id="mode" value="free">
+                            <input type="hidden" name="retry" id="retry" value="no">
+                        </form>
+
+                        <%}%>
+
+
+                    <%}else if(subExists['curSubr']['type']=='beta'){%>
+                        <div class="alert alert-danger">Beta subscription cannot be upgraded.</div>
+                    <%}%>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

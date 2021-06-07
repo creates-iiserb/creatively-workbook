@@ -1,0 +1,69 @@
+ 
+<div class="section section-transparent" id="cards" *ngIf="language">
+  <div class="container tim-container">
+    <!-- <div class="title" align="center">
+        <h2>{{language.text_workbooks}}</h2>
+    </div> -->
+    <br>
+    <div class="row">
+      <div class="col-md-4 col-sm-6" *ngFor="let wb of  wbList">
+          <div class="card card-blog" *ngIf="wb.published">
+              <div *ngIf="wbListId.indexOf(wb.wbId)>-1" class="ribbon ribbon-top-right"><span>{{language.text_subscribed}}</span></div>
+              <div class="card-image">
+                  <a href="javascript:void(0)">
+                      <img class="img" src="{{this.cs.getImgUrl()}}{{wb.pubId}}">
+                  </a>
+              </div>
+              <div class="card-body text-center">
+                  
+                  <h4 class="card-title">
+                      {{wb.title}}
+                  </h4>
+                  <div class="card-description">
+                    <!-- <div *ngIf="wbListId.indexOf(wb.wbId)>-1">
+                      <span class="badge badge-pill badge-success mr-1">Subscribed</span>                    </div> -->
+                    
+                    <small>{{wb.publisher.organization}} </small>                    
+                  </div>
+                  
+                  <div class="card-footer">
+                    <div class="pull-left">
+                      <!-- ratings -->
+                      <div *ngIf="wb['ratings']">
+                        <ul class="star-rating">
+                          <li class="cs-pointer" (click)="getRatings(Reviews)">
+                              &nbsp;&nbsp;&nbsp;
+                              <b>{{wb['ratings']['totalRatings']}}</b>
+                              <!-- <b>{{wb['ratings']['count']}} {{language.text_reviews}}</b> -->
+                          </li>
+                          <li class="small-star {{wb['ratings']['totalRatings']>=5? 'rated-star':''}}">
+                              <i class="fa fa-star" aria-hidden="true"></i>
+                          </li>
+                          <li class="small-star {{wb['ratings']['totalRatings']>=4? 'rated-star':''}}">
+                              <i class="fa fa-star" aria-hidden="true"></i>
+                          </li>
+                          <li class="small-star {{wb['ratings']['totalRatings']>=3? 'rated-star':''}}">
+                              <i class="fa fa-star" aria-hidden="true"></i>
+                          </li>
+                          <li class="small-star {{wb['ratings']['totalRatings']>=2? 'rated-star':''}}">
+                              <i class="fa fa-star" aria-hidden="true"></i>
+                          </li>
+                          <li class="small-star {{wb['ratings']['totalRatings']>=1? 'rated-star':''}}">
+                              <i class="fa fa-star" aria-hidden="true"></i>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div class="pull-right">
+                        <a href="javascript:void(0)" routerLink="/store/{{wb.wbId}}" class="btn btn-primary btn-sm btn-round">{{language.caption_viewDetails}}</a>
+                    </div>
+
+                  </div>
+              </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>

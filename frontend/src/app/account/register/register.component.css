@@ -1,0 +1,28 @@
+.wrapper { 
+    margin-left: -15px !important;
+    margin-right: -15px !important;
+}
+
+.page-header {
+    background: url('/assets/img/workbook/registration/reg-bg21.png') no-repeat, #b6c3d096;
+    background-blend-mode: hard-light;
+    background-position: center center;
+    background-size: cover;
+}
+
+.card {
+    box-shadow: 0 0 260px #fff !important;
+    background: border-box !important;
+}
+
+.page-header .filter::after {
+    background-color: unset !important;
+}
+
+.reg-card {
+    padding:30px;
+    margin-top:25px;
+}
+.pwdmsg {
+    text-align: justify;
+}

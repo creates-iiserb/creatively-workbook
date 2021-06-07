@@ -1,0 +1,28 @@
+.section {
+    padding: 0 !important;
+    padding-top: 70px !important;
+}
+
+.wb-info {
+    text-align: right;
+}
+
+div.info {
+  padding:30px 0 0 0 !important;
+}
+
+.card:not(.card-plain):hover {
+  box-shadow: 0px 12px 19px -7px rgba(0, 0, 0, 0.3);
+  transform: none !important;
+  -webkit-transform: none !important;
+  -ms-transform: none !important;
+  -moz-transform: none !important;
+}
+
+
+
+@media screen and (max-width: 767px) {
+    .wb-info {
+      text-align: center;
+    }
+  }

@@ -1,0 +1,590 @@
+  <div  *ngIf="language">
+    <div class="section">
+      <div class="container-fluid">
+        <div class="card card-plain card-blog">
+          <div class="row section-lightgray">
+            <div class="col-md-4">
+              <div class="card-image" align="center">
+                <br>
+                <img class="img" *ngIf="subDetails.pubId" src="{{imgUrl}}{{subDetails.pubId}}" />
+              </div>
+              <br>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                
+                <h3 class="card-title">
+                  <a href="javascript:void(0)">{{wbDetails.title}}</a>
+                </h3>
+                <div class="card-description">
+                </div>
+                <div>
+                  <a href="javascript:void(0)"><b>{{wbDetails.publisher.name}}, {{wbDetails.publisher.organization}}</b></a>                 
+                  <br><br>
+                  <div *ngIf="wbDetails['isBeta']">
+                    <span class="badge badge-pill badge-warning mr-1">{{language.text_beta}} <strong>V {{wbDetails.version}}</strong></span>
+                    <br><br>
+                  </div>
+                </div>
+                
+                <!-- ratings -->
+                <div class="ratings" *ngIf="subDetails.type!='beta' && reviewsData && reviewsData['entries'].length!=0">
+                  <ul class="star-rating">
+                    <li (click)="NgbTabRef.select('reviews')"  class="cs-pointer">&nbsp;&nbsp;&nbsp;<b>{{reviewsData['entries'].length}} {{language.text_reviews}}</b></li>
+                    <li class="small-star {{(reviewsData['entries'] | utils:'rating')['totalRatings']>=5? 'rated-star':''}}">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </li>
+                    <li class="small-star {{(reviewsData['entries'] | utils:'rating')['totalRatings']>=4? 'rated-star':''}}">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </li>
+                    <li class="small-star {{(reviewsData['entries'] | utils:'rating')['totalRatings']>=3? 'rated-star':''}}">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </li>
+                    <li class="small-star {{(reviewsData['entries'] | utils:'rating')['totalRatings']>=2? 'rated-star':''}}">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </li>
+                    <li class="small-star {{(reviewsData['entries'] | utils:'rating')['totalRatings']>=1? 'rated-star':''}}">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </li>
+                  </ul>
+                </div>
+               
+                <div>
+                  <app-socialshare *ngIf="wbDetails['wbId'] && subDetails.type!='beta'" [wbid]="wbDetails['wbId']" [title]="wbDetails['title']" [tags]="'#workbook'"></app-socialshare>
+                </div>
+                <div class="clearfix"></div>
+                <br>
+                <div>
+                  <button class="btn btn-primary btn-round btn-sm mr-1" *ngIf="update.available" (click)="open(UpdateWBNotice, '')">{{(update.available && update.required)? language.caption_update:language.caption_updateAvail}}</button>
+                  <ng-template #UpdateWBNotice let-c="close" let-d="dismiss">
+                    <div class="modal-header">
+                      <h5 class="font-weight-bold modal-title">{{language.text_updateAvail}}</h5>
+                      <button type="button" class="close" (click)="d('Cross click')">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body"  *ngIf="update.available">
+                      <div class="instruction">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <p>
+                              <app-math [content]="update.updateMsg"></app-math>
+                            </p>
+                          </div>
+                        </div>
+                      </div>      
+                    </div>
+                    <div class="modal-footer"  *ngIf="update.available">
+                      <button type="button" class="btn btn-danger btn-link" (click)="updateWb(subDetails.id);c('Close click')">{{language.caption_update}}</button>
+                    </div>
+                  </ng-template>
+
+
+                  <!-- Subscribe -->
+                  <button class="btn btn-danger btn-round btn-sm mr-1" 
+                    *ngIf="update.required==false && subDetails.type!='paid' && subDetails.type!='beta' && subDetails.validity==true" 
+                    (click)="subscribe()">{{language.caption_subscribe}}</button>
+                </div>
+              </div>
+
+            </div>
+            
+          </div>
+        </div> 
+      </div>
+
+      <!-- worksheets -->
+      <div class="container">
+        <div class="nav-tabs-navigation">
+          <div class="nav-tabs-wrapper">
+            <ngb-tabset #NgbTabRef>
+              <ngb-tab title="{{language.text_worksheets}}">
+                <ng-template ngbTabContent>
+                  <div *ngIf="!update.required; else updtRequire">
+                    <div class="card card-blog" *ngFor="let ws of generatedWs;let wsi=index">
+                      <div class="card-body"> 
+                        
+                        <div class="row">
+                          <div class="col-md-8">     
+                            <h5 class="card-title">
+                              <a href="javascript:void(0)" class="font-weight-bold {{ws.mode=='quiz'? 'text-primary': ws.mode=='certification'? 'text-info':'text-success'}}">{{ws.title}}</a>
+                            </h5>
+                           
+                            <br>
+                            <div class="ws-desc">
+                              <p>
+                                <app-math [content]="ws.description"></app-math>
+                              </p>
+                            </div>
+                            
+                          </div>
+                          <div class="col-md-4">
+
+                            <!-- If update available -->
+                            <div class="pull-right" *ngIf="ws.wsGenerated==true && ws.data.updateAvailable">
+                              <button class="btn btn-link btn-default btn-sm" (click)="open(UpdateWs, 'sm')">{{language.text_updateAvail}}</button>
+                              <ng-template #UpdateWs let-c="close" let-d="dismiss">
+                                <div class="modal-header no-border-header no-title">
+                                    <div></div>
+                                    <button type="button" class="close" (click)="d('Cross click')">&times;</button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p>{{language.msg_wsUpdateMsg}}</p>                                      
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="left-side">
+                                        <button type="button" class="btn btn-default btn-link" (click)="c('Close click')">{{language.caption_notNow}}</button>
+                                    </div>
+                                    <div class="divider"></div>
+                                    <div class="right-side">                                        
+                                        <button type="button" class="btn btn-success btn-link" (click)="updateWs(subDetails.id,ws.id,'update'); d('Cross click')">{{language.caption_update}}</button>
+                                    </div>
+                                </div>
+                              </ng-template>
+                            </div>
+
+                            <h6 class="card-category {{ws.mode=='quiz'? 'text-primary': ws.mode=='certification'? 'text-info':'text-success'}}">
+                              {{ws.mode}} - <i class="fa fa-clock-o" aria-hidden="true"></i> {{ws.duration}} {{language.text_min}}.
+                            </h6>
+                            <div *ngIf="ws.mode=='certification'" class="text-default">
+                              <small><b>Start Time:</b> {{ws.beginTime | date}} - <b>End Time:</b> {{ws.endTime | date}}</small>
+                            </div>
+                            
+                            <div>
+                              <div *ngIf="ws.data&&ws.data.response['resume']==true; else newWS " class="ws-generated">
+                                <!-- progress bar -->
+                                <br>
+                                <span class="font-weight-bold text-muted">{{language.text_progress}}</span>
+                                <br>
+                                <div>
+                                  <table width="100%" border="0"> 
+                                    <tr>
+                                      <td width="25" class="align-middle  text-muted"><i class="fa fa-clock-o" aria-hidden="true"></i></td>
+                                      <td class="align-middle">
+                                        
+                                        <ngb-progressbar *ngIf="ws.mode!='certification'" type="primary" [value]="ws.data.response['timeTakenSeconds']/(ws.selectedDur*60000)*100">
+                                          <span class="font-weight-bold">
+                                            <span *ngIf="(ws.data.response['timeTakenSeconds']|parsetime).split(':')[0]!='00'">{{(ws.data.response['timeTakenSeconds']|parsetime).split(':')[0]}}:</span>
+                                            <span>{{(ws.data.response['timeTakenSeconds']|parsetime).split(':')[1]}}:</span>
+                                            <span>{{(ws.data.response['timeTakenSeconds']|parsetime).split(':')[2]}}</span>
+                                          </span>
+                                        </ngb-progressbar>
+
+                                        <ngb-progressbar *ngIf="ws.mode=='certification'" type="primary" [value]="(ws.data | utils:'certModeTimeUsed').timeUsedPer">
+                                          <span class="font-weight-bold">
+                                            <span *ngIf="((ws.data | utils:'certModeTimeUsed').timeTakenSeconds | parsetime).split(':')[0]!='00'">{{((ws.data | utils:'certModeTimeUsed').timeTakenSeconds|parsetime).split(':')[0]}}:</span>
+                                            <span>{{((ws.data | utils:'certModeTimeUsed').timeTakenSeconds | parsetime).split(':')[1]}}:</span>
+                                            <span>{{((ws.data | utils:'certModeTimeUsed').timeTakenSeconds | parsetime).split(':')[2]}}</span>
+                                          </span>
+                                        </ngb-progressbar>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </div>
+                              
+                                <div>
+                                  <table width="100%" border="0"> 
+                                    <tr>
+                                      <td width="25" class="align-middle text-muted"><i class="fa fa-line-chart" aria-hidden="true"></i></td>
+                                      <td class="align-middle">
+                                        
+                                        <ngb-progressbar *ngIf="ws.data.response['stats']" type="primary" [value]="(ws.data.response['stats']['lock']/ws.data.response['stats']['total'])*100">
+                                          <span class="font-weight-bold">{{ws.data.response['stats']['lock']}}/{{ws.data.response['stats']['total']}}</span>
+                                        </ngb-progressbar>
+                                        <ngb-progressbar *ngIf="!ws.data.response['stats']" type="primary" [value]="0">
+                                          <span class="font-weight-bold">0</span>
+                                        </ngb-progressbar>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </div>
+                                
+                                <div *ngIf="ws.data.isSubmitted;else resumeQuiz">
+
+                                  <div>
+                                    <table width="100%" border="0"> 
+                                      <tr>
+                                        <td width="25" class="align-middle  text-muted"><i class="fa fa-pie-chart" aria-hidden="true"></i></td>
+                                        <td class="align-middle">
+                                          <ngb-progressbar type="success" [value]="(ws.data.summary.score==null||ws.data.summary.score=='')? 0:((ws.data.summary.score/ws.data.summary.max)*100)">
+                                            <span class="font-weight-bold">
+                                              <!-- {{ws.data.summary.score==null||ws.data.summary.score==''? 0:ws.data.summary.score}}/{{ws.data.summary.max}} -->
+                                              {{(ws.data.summary.score==null||ws.data.summary.score=='')? 0:((ws.data.summary.score/ws.data.summary.max)*100).toFixed(2)}}%
+                                            </span>
+                                          </ngb-progressbar>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </div>
+                                  
+                                  <br>
+                                  <button class="btn btn-round btn-primary btn-sm mr-1" (click)="reviewQuiz(wsi)">{{language.caption_review}}</button>
+                                  <button class="btn btn-round btn-warning btn-sm mr-1"  (click)="showSummary(Summary,ws.data.summary)">{{language.caption_summary}}</button>
+                                  <button class="btn btn-round btn-default btn-sm mr-1" *ngIf="ws.mode!='certification'" (click)="updateWs(subDetails.id,ws.id,'reset')">{{language.caption_reset}}</button>
+                                </div>
+                                <br>
+                                <ng-template #resumeQuiz class="my-2">
+                                  
+                                  <br>
+                                  <button class="btn btn-round btn-sm btn-warning" (click)="playQuiz(wsi)">{{language.caption_resume}}</button>
+                                </ng-template>
+                              </div>
+                              <ng-template #newWS>
+                                <br>
+                                
+                                <button *ngIf="!ws.inProgress" class="btn btn-round {{ws.mode=='quiz'? 'btn-primary':'btn-success'}} btn-sm" (click)="playQuiz(wsi)">{{ws.wsGenerated==true? language.caption_play:language.caption_generate}}</button>
+                                <span  *ngIf="ws.inProgress" class="text-primary font-weight-bold">{{language.msg_wsInProgress}}</span>
+                              </ng-template>
+                            </div>
+
+                          </div>
+                        </div> <!--row-->                     
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template id="updtRequire">
+                    <p><b>{{language.msg_updateRequireWb}}</b></p>
+                    <!-- <button class="btn btn-primary btn-round btn-sm mr-1" *ngIf="update.available">{{language.caption_update}}</button> -->
+                  </ng-template>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab title="{{language.text_desc}}">
+                <ng-template ngbTabContent>
+                  <app-math [content]="wbDetails.description"></app-math>
+                </ng-template>
+              </ngb-tab>
+              
+              <ngb-tab title="{{language.text_subsDetails}}">
+                <ng-template ngbTabContent>
+                  
+                  <div>
+                    <table border="0" class="table sub-details">
+                      <tr>
+                        <td width="180">{{language.text_subsValidity}}</td><td width="10">:</td><td>
+                          <i *ngIf="subDetails.validity" class="fa fa-check-circle text-success" aria-hidden="true"></i><i *ngIf="!subDetails.validity" class="fa fa-times text-danger" aria-hidden="true"></i></td>
+                      </tr>
+                      <tr>
+                        <td>{{language.text_subsStatus}}</td><td width="10">:</td><td>{{subDetails.daysLeft}} / {{subDetails.period}} {{language.text_days}}</td>
+                      </tr>
+                      <tr>
+                        <td>{{language.text_period}}</td><td width="10">:</td><td>{{subDetails.period}} {{language.text_days}}</td>
+                      </tr>
+                      <tr>
+                        <td>{{language.text_validUpto}}</td><td width="10">:</td><td>{{subDetails.endDate | date}}</td>
+                      </tr>
+                      <tr>
+                        <td>{{language.text_type}}</td><td width="10">:</td><td>{{subDetails.type}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab title="{{language.text_authorDetails}}" *ngIf="wbDetails.publisher">
+                <ng-template ngbTabContent>
+                  <div>
+                    <img *ngIf="wbDetails.publisher.photoURL" src="{{wbDetails.publisher.photoURL}}" class="img-thumbnail img-circle" alt="" width="100"><br><br>
+                    <p *ngIf="wbDetails.publisher.name">{{wbDetails.publisher.name}}</p>
+                    <p *ngIf="wbDetails.publisher.designation">{{wbDetails.publisher.designation}}</p>
+                    <p *ngIf="wbDetails.publisher.organization">{{wbDetails.publisher.organization}}</p>
+                    <p *ngIf="wbDetails.publisher.areaOfExp && wbDetails.publisher.areaOfExp.length!=0"><b>{{language.text_areaOfExp}}:</b> {{wbDetails.publisher.areaOfExp.join(', ')}}</p>
+                    <h4 *ngIf="wbDetails.publisher.aboutPublisher"><b>{{language.text_about}}</b></h4>
+                    <br>
+                    <p *ngIf="wbDetails.publisher.aboutPublisher" class="about-author">{{wbDetails.publisher.aboutPublisher}}</p>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab>
+                <ng-template ngbTabTitle>
+                  {{language.text_discussionForum}} <span *ngIf="newForumMsg.length>0" class="badge badge-pill badge-info mr-1">{{(newForumMsg | forumnotification:'':'workbook':'notification')}}</span>
+                </ng-template>
+                <ng-template ngbTabContent>
+                   <!-- Forums -->
+                  <div class="row">
+                    <div class="col-md-12">                   
+                    <span class="btn btn-just-icon btn-primary pull-right" (click)="forumsStart()"><i class="fa fa-refresh" aria-hidden="true"></i></span>
+                      <h6 class="card-category">{{language.text_discussionForum}}</h6>
+                      
+                      <div *ngIf="forums">
+                        <div *ngIf="forumSlideToggle">
+                          <div *ngIf="forums['entries'].length==0; else Queries">
+                            {{language.msg_noQryForForum}}
+                          </div>   
+                          <ng-template #Queries>
+                
+                            <div class="media-area">
+                              <div class="media" *ngFor="let query of (forums['entries'] | forum:'question':'none') | paginate: { itemsPerPage: 5, currentPage: p }; let i=index">
+                                
+                                <div class="avatar pull-left">
+                                  <img class="media-object" src="{{userImg}}{{query.wbuser}}"/>
+                                </div>
+                                
+                                <div class="media-body pull-right">
+                                  
+                                  <div>
+                                    <span class="media-heading pull-left">
+                                      {{query.wbuser.split('@')[0]}} &nbsp;
+                                      <span class="badge badge-pill badge-danger mr-1" *ngIf="(newForumMsg | forumnotification: query:'workbook':'question').length!=0">{{(newForumMsg | forumnotification: query:'workbook':'question').length}}</span>
+                                      <br><small class="text-muted">{{query.timestamp | date}}</small>
+                                      
+                                    </span>
+                                    <span class="btn btn-info btn-link pull-right "(click)="forumToggle(query)"> <i class="fa fa-reply"></i> {{language.caption_view}}</span>
+                                    <div class="clearfix"></div>
+                                  </div>
+                                  
+                                  <div>
+                                    <p class="text-default"><app-math [content]="query.statement"></app-math></p>
+                                  </div>
+                                  <br>
+                                  <div class="media-footer">
+                                    <a href="javascript:void(0)" class="btn btn-link {{(forums.likes | forum: 'like_status':query.timestamp+'-'+query.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                      <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':query.timestamp+'-'+query.randomId).length}}
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':query.timestamp+'-'+query.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                      <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':query.timestamp+'-'+query.randomId).length}}
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn btn-link">
+                                      {{language.text_views}} &middot; {{(forums.views | forum: 'views':query.timestamp+'-'+query.randomId).length}}
+                                    </a>
+                                  </div>
+                                  
+                                
+                                  <div class="clearfix"></div>
+                                </div>
+                                <hr>
+                              </div> <!-- end media -->
+                            </div>
+                            
+                          </ng-template> 
+                
+
+                          <div class="row">
+                            <div class="col-md-12">
+                              <p><b>{{language.text_yourQus}}</b></p>
+                              <div>
+                                <div *ngIf="forumQus" style="max-height: 200px; overflow-y:scroll;">
+                                  <span class="font-weight-bold">{{language.text_preview}}</span>
+                                  <p><app-math [content]="forumQus"></app-math></p>
+                                </div>
+                                <textarea class="form-control" [(ngModel)]="forumQus" rows="3"></textarea>
+                                <br>
+                                <button class="btn btn-sm btn-primary btn-round pull-right" (click)="forumPost('question','none',forumQus)">{{language.caption_askQus}}</button>
+                              </div>
+                              
+                            </div>
+                          </div>
+
+                          <pagination-controls (pageChange)="p = $event"></pagination-controls>
+                          
+                        </div> 
+                
+                        <div *ngIf="!forumSlideToggle">
+                          <div *ngIf="currForumQry">
+                            
+                            <div class="media-area">
+                              <div class="media">
+                                
+                                <div class="avatar pull-left">
+                                  <img class="media-object" src="{{userImg}}{{currForumQry.wbuser}}"/>
+                                </div>
+                                
+                                <div class="media-body pull-right">
+                                  <div class="forum-qus">
+                                    <div>
+                                      <span class="media-heading pull-left">{{currForumQry.wbuser.split('@')[0]}} 
+                                      <span class="badge badge-pill badge-danger mr-1" *ngIf="(newForumMsg | forumnotification: currForumQry:'workbook':'question').length!=0">{{(newForumMsg | forumnotification: currForumQry:'workbook':'question').length}}</span>
+                                      <br><small class="text-muted">{{currForumQry.timestamp | date}}</small></span>
+                                      <span class="btn btn-info btn-link pull-right " (click)="forumToggle()"> <i class="fa fa-reply"></i> {{language.caption_back}}</span>
+                                      <div class="clearfix"></div>
+                                    </div>
+                                    
+                                    <div>
+                                      <p class="text-default"><app-math [content]="currForumQry.statement"></app-math></p>
+                                    </div>
+                                    
+                                    <div class="media-footer">
+                                      <span (click)="setLike(currForumQry.timestamp+'-'+currForumQry.randomId,true)" class="btn btn-link {{(forums.likes | forum: 'like_status':currForumQry.timestamp+'-'+currForumQry.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':currForumQry.timestamp+'-'+currForumQry.randomId).length}}
+                                      </span>
+                                      <span (click)="setLike(currForumQry.timestamp+'-'+currForumQry.randomId,false)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':currForumQry.timestamp+'-'+currForumQry.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                        <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':currForumQry.timestamp+'-'+currForumQry.randomId).length}}
+                                      </span>
+                                      <span class="btn btn-link">
+                                        {{language.text_views}} &middot; {{(forums.views | forum: 'views':currForumQry.timestamp+'-'+currForumQry.randomId).length}} 
+                                      </span>
+                                    </div>
+                                  </div>
+                                
+                                  <div class="clearfix"></div>
+                
+                                  <!-- Answer -->
+                                  <h6 class="font-weight-bold text-success" *ngIf="(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length>0">
+                                    {{(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length}} {{language.text_answer}}
+                                  </h6>
+                                  <div class="media" *ngFor="let ans of (forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId); let i=index">
+                                    
+                                    <div class="avatar pull-left">
+                                      <img class="media-object" width="30" src="{{userImg}}{{ans.wbuser}}"/>
+                                    </div>
+                                    
+                                    <div class="media-body pull-right">
+                                      <div>
+                                        <span class="media-heading pull-left">{{ans.wbuser.split('@')[0]}}&nbsp;
+                                          <small class="text-muted">{{ans.timestamp | date}}</small>&nbsp;&nbsp;
+                                          <small class="text-danger" *ngIf="(newForumMsg | forumnotification: ans:'workbook':'answer').length!=0">New</small>
+                                        </span>
+                                        <div class="clearfix"></div>
+                                      </div>
+                                      
+                                      <div>
+                                        <p class="text-default"><app-math [content]="ans.statement"></app-math></p>
+                                      </div>
+                                      <div class="media-footer">
+                                        <span (click)="setLike(ans.timestamp+'-'+ans.randomId,true)" class="btn btn-link {{(forums.likes | forum: 'like_status':ans.timestamp+'-'+ans.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                          <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':ans.timestamp+'-'+ans.randomId).length}}
+                                        </span>
+                                        <span (click)="setLike(ans.timestamp+'-'+ans.randomId,false)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':ans.timestamp+'-'+ans.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                          <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':ans.timestamp+'-'+ans.randomId).length}}
+                                        </span>
+                                      </div>
+
+                                      <!-- Comment -->
+                                      <h6 class="font-weight-bold text-success" *ngIf="(forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId).length>0">
+                                        {{(forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId).length}} {{language.text_comment}}
+                                      </h6>
+                                      <div *ngFor="let cmnt of (forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId); let i=index">
+                                          <small class="text-default">
+                                            <app-math [content]="cmnt.statement"></app-math> 
+                                            - <span class="text-primary">{{cmnt.wbuser.split('@')[0]}} <span class="text-muted">{{cmnt.timestamp | date}}</span></span>&nbsp;&nbsp;
+                                            <small class="text-danger" *ngIf="(newForumMsg | forumnotification: cmnt:'workbook':'answer').length!=0">New</small>
+                                          </small>
+                                          <hr>
+                                      </div>
+                                      
+                                      <div class="row">
+                                        <div class="col-md-12">
+                                          <div class="tabs">
+                                            <div class="tab">
+                                              <input type="checkbox" id="chck{{i}}">
+                                              <label class="tab-label text-muted" for="chck{{i}}">{{language.text_addComment}}</label>
+                                              <div class="tab-content">
+                                                  <textarea [(ngModel)]="forumComment[i]" rows="2" name="comment_{{i}}" id="comment_{{i}}" class="form-control input-sm"></textarea>
+                                                  <br>
+                                                  <div align="right">
+                                                    <button class="btn btn-sm"  (click)="forumPost('comment',ans.timestamp+'-'+ans.randomId,forumComment[i],currForumQry.timestamp+'-'+currForumQry.randomId)">{{language.text_comment}}</button>
+                                                  </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    
+                                      <div class="clearfix"></div>
+                                    </div>
+                                  </div> <!-- end media answer -->
+                
+                                </div>
+                                <hr>
+                              </div> <!-- end media -->
+                              <br>
+                            </div>
+                            
+                            <div>
+                              <p><b>{{language.text_yourAns}}</b></p>
+                              <!-- <ckeditor [(ngModel)]="forumAns" [config]="ckeditorConfig"></ckeditor><br> -->
+                              <textarea [(ngModel)]="forumAns" class="form-control"></textarea>
+                              <br>
+                              <div class="pull-right"><button class="btn btn-sm btn-primary btn-round"  (click)="forumPost('answer',currForumQry.timestamp+'-'+currForumQry.randomId,forumAns,currForumQry.timestamp+'-'+currForumQry.randomId)">{{language.caption_postAns}}</button></div>
+                            </div>
+                          </div>
+                        </div>
+                
+                      </div>
+                                      
+                    </div>
+                  </div>
+                </ng-template>
+              </ngb-tab>
+
+              <ngb-tab title="Review" id="reviews" *ngIf="subDetails.type!='beta'">
+                <ng-template ngbTabContent>
+                  <app-ratings *ngIf="reviewsData" [data]="reviewsData['entries']" [flag]="true" (setRating)="ratingpost($event)"></app-ratings>
+                </ng-template>
+              </ngb-tab>
+
+            </ngb-tabset>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <ng-template #Summary let-c="close" let-d="dismiss">
+        <div class="modal-header">
+            <h5 class="font-weight-bold modal-title">{{language.text_summary}}</h5>
+            <button type="button" class="close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+          <table width="100%" class="ml-auto mr-auto">  
+            <tr>
+              <td class="center-align" width="33%">
+                <h4>{{wsSummary.score==null||wsSummary.score==''? 0:wsSummary.score+wsSummary.partialScores}}/{{wsSummary.max}}</h4>
+                <span class="text-success font-weight-bold">{{language.text_score}}</span>
+              </td>
+              <td class="center-align" width="33%">
+                <h4>{{wsSummary.correct}}</h4>
+                <span class="text-warning font-weight-bold">{{language.text_correctAns}}</span>
+              </td>
+              <td class="center-align" width="33%">
+                <h4>{{wsSummary.time | parsetime}}</h4>
+                <span class="text-danger font-weight-bold">{{language.text_timeTaken}}</span>
+              </td>
+            </tr>  
+          </table>
+          <br>
+          
+          <table width="100%" class="ml-auto mr-auto" class="summary">  
+            <tr><td>{{language.text_totalQus}}</td> <td class="right-align"> {{wsSummary.total}}</td></tr>
+            <tr><td>{{language.text_attemptedQus}}</td> <td class="right-align"> {{wsSummary.attempted}}</td></tr>
+            <tr><td>{{language.text_gradableQus}}</td> <td class="right-align"> {{wsSummary.gradable}}</td></tr>
+            <tr><td>{{language.text_pendingToGradeQus}}</td> <td class="right-align"> {{wsSummary.pending}}</td></tr>
+            <tr><td>{{language.text_gradedQus}}</td> <td class="right-align"> {{wsSummary.graded}}</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;{{language.text_attemptedQus}}</td> <td class="right-align"> {{wsSummary.attempted}}</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;{{language.text_incorrectAns}}</td> <td class="right-align"> {{wsSummary.incorrect}}</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;{{language.text_skippedQus}}</td> <td class="right-align"> {{wsSummary.skipped}}</td></tr>
+            <tr><td>&nbsp;&nbsp;&nbsp;{{language.text_helpUsed}}</td> <td class="right-align"> {{wsSummary.help}}</td></tr>
+                      
+            <!-- <tr><td>{{language.text_total}}</td> <th class="right-align"> {{wsSummary.total}}</td></tr> -->
+            <tr><td>{{language.text_ungradedQus}}</td> <td class="right-align"> {{wsSummary.ungraded}}</td></tr>
+          </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-link" (click)="c('Close click')">{{language.caption_close}}</button>
+        </div>
+    </ng-template>
+
+    <ng-template #AskRating let-c="close" let-d="dismiss">
+      <!-- <div class="modal-header no-border-header no-title">
+          <div>{{language.text_ratingUs}}</div>
+          <button type="button" class="close" (click)="d('Cross click')">&times;</button>
+      </div> -->
+      
+      <div class="modal-body text-center">
+       
+        <p>{{language.text_ratingUs}} {{language.msg_reviewUs}}</p>                                      
+      </div>
+      <div class="modal-footer">
+          <div class="left-side">
+              <button type="button" class="btn btn-primary btn-link" (click)="c('Close click')">{{language.caption_remindMeLater}}</button>
+          </div>
+          <div class="divider"></div>
+          <div class="right-side">                                        
+              <button type="button" class="btn btn-success btn-link" (click)="NgbTabRef.select('reviews'); d('Cross click')">{{language.caption_rateUs}}</button>
+          </div>
+      </div>
+    </ng-template>
+  </div> 

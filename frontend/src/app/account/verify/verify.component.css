@@ -1,0 +1,19 @@
+
+.card {
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+.card-title {
+    color: #6bd098;
+    font-weight: bold;
+}
+
+.card-title-warning {
+    color: #fbc658;
+}
+
+body {
+    background: #f4f3ef !important;
+}

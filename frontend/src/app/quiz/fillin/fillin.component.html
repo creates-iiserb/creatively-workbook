@@ -1,0 +1,18 @@
+<div *ngIf="isChanges">
+  <br>
+  <!-- Question Here -->
+  <div  class="qus-txt">
+    <app-math [content]="QusData.question"></app-math>
+  </div>
+  <br>
+  <!-- Statement -->
+  <div>
+    <p id="{{QuizRes.lock==true? 'dcontent':''}}" class="{{QuizRes.lock||isReview==true? 'card-quiz':''}}">
+      <app-math id="fillin" [content]="QusData.statement"></app-math>
+    </p>
+    <p>
+      <small><app-math [content]="QusData.suggestion"></app-math></small>
+    </p>
+  </div>
+</div>
+ 

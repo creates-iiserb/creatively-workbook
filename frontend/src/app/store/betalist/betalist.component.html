@@ -1,0 +1,41 @@
+<div class="section section-transparent" id="cards" *ngIf="language">
+    <div class="container tim-container">
+        <!-- <div class="title" align="center">
+            <h2>{{language.text_beta}} {{language.text_workbooks}}</h2>
+        </div> -->
+        <br>
+        <div class="row">
+            <div class="col-md-4 col-sm-6" *ngFor="let wb of  wbList">
+                <div class="card card-blog">
+                    <div *ngIf="wbListId.indexOf(wb.betaId)>-1" class="ribbon ribbon-top-right"><span>{{language.text_subscribed}}</span></div>
+                    <div class="card-image">
+                        <a href="javascript:void(0)">
+                            <img class="img" src="{{this.cs.getImgUrl()}}{{wb.pubId}}">
+                        </a>
+                    </div>
+                    <div class="card-body text-center">
+                        
+                        <h4 class="card-title">
+                            {{wb.title | slice:0:40}} {{wb.title.length>40? '...':''}}
+                        </h4>
+                        
+                        <div class="card-description">
+                            
+                            <!-- <div *ngIf="wbListId.indexOf(wb.betaId)>-1">
+                            <span class="badge badge-pill badge-success mr-1">Subscribed</span>
+                            </div> -->
+                            <!-- <b>Price: </b> {{wb.pricing.price}}   {{wb.pricing.currency}} <br> -->
+                            <small>{{wb.publisher.organization}}</small>
+                            <!-- <b>Level :</b>    {{wb.category.level}}  <br> -->
+                        </div>
+                        
+                        <div class="card-footer">
+                            <a href="javascript:void(0)" routerLink="/store/beta/{{wb.wbId}}/{{wb.pubId}}" class="btn btn-primary btn-sm btn-round">{{language.caption_viewDetails}}</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

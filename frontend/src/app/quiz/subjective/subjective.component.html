@@ -1,0 +1,120 @@
+<br>
+<!-- Question Here -->
+
+<div *ngIf="language">
+    <div class="qus-txt">
+    <app-math [content]="QusData.question"></app-math>
+    </div>
+    <br>
+    
+    <div *ngIf="isReview==false" class="{{quizRes.lock||isReview==true? 'card-quiz':''}}">
+        <div *ngIf="cursor && cursor!='' && QusData.limit>0">
+            <p class="text-primary font-weight-bold">{{!quizRes.lock? language.text_preview:language.text_yourAns}}</p> 
+            <div class="preview">
+                <app-math [content]="cursor"></app-math>
+            </div>
+        </div>
+
+        <div *ngIf="!quizRes.lock && ckeditorConfig && QusData.limit>0">
+            <ckeditor [(ngModel)]="cursor" [config]="ckeditorConfig" (change)="updateRes($event)"></ckeditor>
+        </div>
+
+        <br>
+        <div *ngIf="!quizRes.lock">
+            
+            <span class="pull-right">
+                <button *ngIf="QusData.allowedDrawings!=0 && quizRes.tempAns['drawing'] && quizRes.tempAns['drawing'].length<QusData.allowedDrawings && !showWBoard" class="btn btn-sm btn-outline-default btn-round mr-1" (click)="openWBoard('new')">
+                    <i class="fa fa-paint-brush" aria-hidden="true"></i> <b>&#x271A;</b>
+                </button>
+                <ng-template *ngIf="quizRes.tempAns['drawing'].length > QusData.allowedDrawings" class="text-default">
+                    <b>{{language.text_drawingsAllowed}}</b>&nbsp;&nbsp;
+                </ng-template>
+                <!-- <button *ngIf="QusData.limit>=(cursor | utils:'strcount')" class="btn btn-sm btn-round btn-primary pull-right" (click)="setAnswer()">{{language.caption_answer}}</button> -->
+            </span>
+            <span class="pull-left font-weight-bold text-default" *ngIf="QusData.limit>0">
+                {{language.text_charLimit}} ({{QusData.limit}}) : 
+                <span class="{{QusData.limit<(cursor | utils:'strcount')? 'text-danger':''}}"><b>{{cursor | utils:'strcount'}}</b></span>&nbsp;&nbsp;
+                |&nbsp;&nbsp;<span class="text-primary cursor-pointer" (click)="open(MathDocs)">Math Docs</span>
+            </span>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+        <br>
+        <!-- images -->
+        <div *ngIf="quizRes.tempAns['drawing'] && quizRes.tempAns['drawing'].length!=0">
+            <p class="text-primary font-weight-bold">{{language.text_drawings}}</p>
+            <br>
+            <div class="row">
+                <div class="col-md-4" *ngFor="let drawing of quizRes.tempAns['drawing']; let i=index">
+                    <div class="card drawing">
+                        <div class="card-body">
+                            <div align="right" *ngIf="!quizRes.lock">
+                                <span class="text-primary pointer mr-1 cursor-pointer" (click)="openWBoard('edit',drawing,i)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></span>&nbsp;
+                                <span class="text-danger cursor-pointer" (click)="removeDrawing(i)"><i class="fa fa-trash" aria-hidden="true"></i></span>
+                            </div>
+                            <br>
+                            <div class="drawings" [innerHtml]="drawing['snapshot'] | utils:'wboardImg'"></div>
+                            <!-- <app-wboard [wboardData]="{'data':drawing,'type':'image'}"></app-wboard> -->
+                            <!-- <img class="drawing-img" src="{{drawing['snapshot'] | utils:'wboardImg'}}" alt=""> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <br>
+        <!-- wboard -->
+        <div class="card wboard" *ngIf="showWBoard">
+            <div class="card-body">
+                <div class="pull-right text-muted cursor-pointer" (click)="closeWBoard()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                <h6 class="card-category text-default">{{language.text_drawingBoard}} </h6>
+                <app-wboard [wboardData]="wBoardOpt" (wBoardRes)="setDrawing($event)"></app-wboard>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div *ngIf="isReview==true && quizRes.lock==true" class="card-quiz">
+    <p class="text-primary font-weight-bold">{{!quizRes.lock? language.text_preview:language.text_yourAns}}</p>     
+    <app-math [content]="cursor"></app-math>
+    <div *ngIf="quizRes.tempAns['drawing'] && quizRes.tempAns['drawing'].length!=0">
+        <p class="text-primary font-weight-bold">{{language.text_drawings}}</p>
+        <br>
+        <div class="row">
+            <div class="col-md-4" *ngFor="let drawing of quizRes.tempAns['drawing']; let i=index">
+                <div class="card drawing">
+                    <div class="card-body">
+                        <div class="drawings" [innerHtml]="drawing['snapshot'] | utils:'wboardImg'"></div>
+                        <!-- <img class="drawing-img"  src="{{drawing['snapshot'] | utils:'wboardImg'}}" alt=""> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+</div>
+
+<div *ngIf="isReview==true && quizRes.lock==false">
+    <span class="text-danger font-weight-bold">{{language.text_notAnswered}}</span>
+</div>
+
+<div *ngIf="isReview==true">
+    <hr>
+    <p class="font-weight-bold text-success">{{language? language.text_correctAns:''}}</p>
+    <app-math [content]="qusResData['correctAns']"></app-math>
+</div>
+
+<ng-template #MathDocs let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <!-- <h5 class="modal-title"></h5> -->
+        <button type="button" class="close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <iframe src="https://examineer.in/docs/mathHelp.html" title="W3Schools Free Online Web Tutorials" width="100%"></iframe>    
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.text_close}}</button>
+    </div>
+    </ng-template>

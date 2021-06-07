@@ -1,0 +1,143 @@
+<div class="row" *ngIf="reviewsData && data">
+    <div class="col-md-3">
+        <p class="heading"><b>{{language.text_reviews}}</b></p>
+        <table>
+            <tr>
+                <td><span class="rating-value">{{reviewsData['totalRatings']}}</span></td>
+                <td class="star-reviews">
+                    <div>
+                        <ul class="star-rating reviews-stars">
+                            <li class="small-star {{reviewsData['totalRatings']>=5? 'rated-star':''}}">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </li>
+                            <li class="small-star {{reviewsData['totalRatings']>=4? 'rated-star':''}}">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </li>
+                            <li class="small-star {{reviewsData['totalRatings']>=3? 'rated-star':''}}">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </li>
+                            <li class="small-star {{reviewsData['totalRatings']>=2? 'rated-star':''}}">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </li>
+                            <li class="small-star {{reviewsData['totalRatings']>=1? 'rated-star':''}}">
+                                <i class="fa fa-star" aria-hidden="true"></i>
+                            </li>
+                        </ul>
+                    </div>
+                    <p>{{data.length}} reviews</p>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table width="100%" class="ratings">
+            <tr>
+                <td width="60"><b>{{language.text_5star}}</b>&nbsp;</td>
+                <td><ngb-progressbar type="warning" [value]="(reviewsData['5star']/data.length)*100"></ngb-progressbar></td>
+                <td width="20">&nbsp;&nbsp;<b>{{data.length==0? 0:((reviewsData['5star']/data.length)*100).toFixed(0)}}%</b></td>
+            </tr>
+            <tr>
+                <td><b>{{language.text_4star}}</b>&nbsp;</td>
+                <td><ngb-progressbar type="warning" [value]="(reviewsData['4star']/data.length)*100"></ngb-progressbar></td>
+                <td>&nbsp;&nbsp;<b>{{data.length==0? 0:((reviewsData['4star']/data.length)*100).toFixed(0)}}%</b></td>
+            </tr>
+            <tr>
+                <td><b>{{language.text_3star}}</b>&nbsp;</td>
+                <td><ngb-progressbar type="warning" [value]="(reviewsData['3star']/data.length)*100"></ngb-progressbar></td>
+                <td>&nbsp;&nbsp;<b>{{data.length==0? 0:((reviewsData['3star']/data.length)*100).toFixed(0)}}%</b></td>
+            </tr>
+            <tr>
+                <td><b>{{language.text_2star}}</b>&nbsp;</td>
+                <td><ngb-progressbar type="warning" [value]="(reviewsData['2star']/data.length)*100"></ngb-progressbar></td>
+                <td>&nbsp;&nbsp;<b>{{data.length==0? 0:((reviewsData['2star']/data.length)*100).toFixed(0)}}%</b></td>
+            </tr>
+            <tr>
+                <td><b>{{language.text_1star}}</b>&nbsp;</td>
+                <td><ngb-progressbar type="warning" [value]="(reviewsData['1star']/data.length)*100"></ngb-progressbar></td>
+                <td>&nbsp;&nbsp;<b>{{data.length==0? 0:((reviewsData['1star']/data.length)*100).toFixed(0)}}%</b></td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        <p *ngIf="flag==true" class="heading"><b>{{language.text_ratingUs}}</b></p>
+        <div class="row" *ngIf="flag==true">
+            <div class="col-md-4">
+                <section class="text-center">
+                    <ul class="star-rating">
+                        <li class="star {{ratingVal>=5? 'rated-star':''}}" value="5" title="WOW!!!" (click)="rateStar(5)" >
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="star {{ratingVal>=4? 'rated-star':''}}" value="4" title="Excellent" (click)="rateStar(4)" >
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="star {{ratingVal>=3? 'rated-star':''}}" value="3" title="Good" (click)="rateStar(3)" >
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="star {{ratingVal>=2? 'rated-star':''}}" value="2" title="Fair" (click)="rateStar(2)" >
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="star {{ratingVal>=1? 'rated-star':''}}" value="1" title="Poor" (click)="rateStar(1)" >
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="col-md-8">
+                <span class="rating-exp {{ratingVal==5? 'text-success':ratingVal==4? 'text-primary':ratingVal==3? 'text-info':ratingVal==2? 'text-warning':'text-danger'}}" *ngIf="ratingVal">
+                    <b>{{ratingVal==5? 'WOW!!!':ratingVal==4? 'Excellent':ratingVal==3? 'Good':ratingVal==2? 'Fair':'Poor'}}</b>
+                </span>
+            </div>
+        </div>
+
+        <div *ngIf="flag==true">
+            <div *ngIf="(reviewsData && reviewsData['isRated'].length==0); else Cmnt">
+                <p><b>{{language.text_comment}}</b></p>
+                <textarea class="form-control" rows="3" [(ngModel)]="comment"></textarea>
+                <br> 
+                <div class="pull-right" *ngIf="comment && ratingVal">
+                    <button class="btn btn-sm btn-primary btn-round" (click)="rateUs()">{{language.caption_rateUs}}</button>
+                </div>
+                <div class="clearfix"></div>
+                <hr>
+            </div>
+            <br>
+            <ng-template #Cmnt>
+                <p><b>by {{reviewsData['isRated'][0]['wbuser'].split('@')[0]}} &nbsp;&nbsp;{{reviewsData['isRated'][0]['timestamp'] | date}}</b></p>
+                <p *ngIf="reviewsData">{{reviewsData['isRated'][0]['statement']}}</p>
+                <hr>
+            </ng-template>
+        </div>
+
+        <div *ngFor="let reviews of (data | slice:showReviews[0]:showReviews[1])">
+            <div class="users-reviews" *ngIf="reviews.wbuser!=crrUser">
+                <div>
+                    <ul class="star-rating reviews-stars">
+                        <li class="small-star {{reviews.rating>=5? 'rated-star':''}}">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="small-star {{reviews.rating>=4? 'rated-star':''}}">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="small-star {{reviews.rating>=3? 'rated-star':''}}">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="small-star {{reviews.rating>=2? 'rated-star':''}}">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                        <li class="small-star {{reviews.rating>=1? 'rated-star':''}}">
+                            <i class="fa fa-star" aria-hidden="true"></i>
+                        </li>
+                    </ul>
+                </div>
+                <p class="byuser font-weight-bold text-default"><small>by {{reviews.wbuser.split('@')[0]}} &nbsp;&nbsp; {{reviews.timestamp | date}}</small></p>
+                <p class="user-comment text-default">{{reviews.statement}}</p>
+            </div>
+        </div>
+        <div *ngIf="data" align="center">
+            <button *ngIf="showReviews[0]!=0" class="btn btn-sm btn-primary mr-1" (click)="preview()">{{language.caption_previous}}</button>
+            <button *ngIf="showReviews[1]<data.length" class="btn btn-sm btn-primary mr-1" (click)="next()">{{language.caption_next}}</button>
+        </div>
+
+    </div>
+</div>
+

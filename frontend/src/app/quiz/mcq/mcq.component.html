@@ -1,0 +1,12 @@
+<br>
+<!-- Question Here -->
+<div class="qus-txt">
+  <app-math [content]="QusData.question"></app-math>
+</div>
+<br>
+<!-- Options Here -->
+<div class="{{quizRes.lock||isReview==true? 'card-quiz':''}}">
+  <p *ngFor="let option of QusData.options" class="cursor-pointer option {{option.Id==cursor? 'option-success':''}}" (click)="setAnswer(option.Id)">
+    <app-math [content]="option.statement"></app-math>
+  </p>
+</div>

@@ -1,0 +1,36 @@
+.section {
+    min-height: 100vh !important;
+}
+
+table.grading-tbl th.bg-primary,td.bg-primary {
+    background: rgb(109, 211, 214,.1) !important;
+}
+
+table.grading-tbl th.bg-info,td.bg-info {
+    background: rgb(110, 199, 224,.2) !important;
+}
+
+table.grading-tbl th.bg-success,td.bg-success {
+    background: rgb(134, 217, 171,.2) !important;
+}
+
+.card {
+    /* background: #f1f1f1ba !important; */
+    /* background: #ececec40 !important; */
+    background: #e8e7e3a3 !important;
+}
+
+.start-btn {
+    text-align: right;
+}
+
+@media only screen and (max-width: 767px) {
+    .dur-mode {
+        text-align: center !important;
+        margin: -15px 0 15px;
+    }
+
+    .start-btn {
+        text-align: center !important;
+    }
+}

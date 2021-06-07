@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+
+<div class="card">
+    <img src="<%-wbDets['img']%>" class="card-img-top" alt="wb image">
+    <div class="card-body">
+        <h5 class="card-title"><%-wbDets['title']%></h5>
+        <p class="card-text">
+            By <span class="text-muted"><%-wbDets['publisher']['name']%></span> 
+        </p>
+        <hr>
+        <%if(txn['status']=='subscriptionUpdated'){%>
+            <div class="alert alert-success">
+                Transaction successful
+            </div>
+            <table class="table table-responsive">
+                <tr>
+                    <td>Order Id</td>
+                    <td><%-txn['orderId']%></td>
+                </tr>
+                <tr>
+                    <td>Date</td>
+                    <td><%-txn['date']%></td>
+                </tr>
+                <tr>
+                    <td>Amount</td>
+                    <td><%-txn['price']['currency']+" "+txn['price']['amount'] %></td>
+                </tr>
+                <tr>
+                    <td>Payment gateway</td>
+                    <td><%-txn['gateway']%></td>
+                </tr>
+                <tr>
+                    <td>Subscription status</td>
+                    <td>Updated to "paid" for <%-sub['curSubr']['period']%> days</td>
+                </tr>
+            </table>
+
+            <br>
+            <a href="<%-wbHomeUrl+subId%>">Go to workbook</a>
+
+        <%}else{%>
+            <div class="alert alert-danger">
+                Your last transaction failed. 
+            </div>
+            <br>      
+            If the amount (<%- txn['price']['currency']+" "+txn['price']['amount'] %>) was deducted from your account and subscription status is not updated, contact us at <%-supportEmail%>.
+            <br>
+            Mention the order Id <%-txn['orderId']%>.
+            <br>
+            If the amount was not deducted, you can <a href="<%-wbHomeUrl+subId%>"> try again</a> . 
+        <%}%>    
+    </div>
+</div>
+        </div>
+    </div>
+</div>

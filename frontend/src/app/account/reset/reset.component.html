@@ -1,0 +1,27 @@
+
+<div class="wrapper" *ngIf="language">
+    <div class="page-header">
+        <div class="filter"></div>
+            <div class="container">
+                <div class="row">                    
+                  <div class="col-md-4 col-sm-6 ml-auto mr-auto">
+                    <div class="card card-register">
+                      <h3 class="card-title text-center">{{language.text_forgetPassword}}</h3>
+                      <h6 align="center"><small>{{language.text_enterEmailToResetPwd}}</small> </h6>
+                      <br>                      
+                      <form class="register-form">
+                        <input type="email" class="form-control" [(ngModel)]="wbuser" name="wbuser" placeholder="{{language.text_email}}">
+                        <button class="btn btn-block btn-round" (click)="sendResetLink()">{{language.caption_sendResetLink}}</button>
+                      </form>
+                      <div class="login">
+                        <p>{{language.text_clickToLogin}}  <a href="javascript:void(0)" [routerLink]="['/account/login']">{{language.caption_logIn}}</a>.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        <div class="demo-footer text-center">
+            <h6>&copy; {{data | date: 'yyyy'}}, made with <i class="fa fa-heart heart"></i> by Examineer</h6>
+        </div>
+    </div>
+</div>

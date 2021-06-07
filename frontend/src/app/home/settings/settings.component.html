@@ -1,0 +1,170 @@
+<div class="wrapper" *ngIf="language">
+    <div class="page-header page-header-xs settings-background" style="background-image: url('./assets/img/sections/joshua-earles.jpg')">
+        <div class="filter"></div>
+    </div>
+    <div class="profile-content section">
+        <div class="container">
+            <div class="row">
+                <div class="profile-picture">
+                    <div class="fileinput fileinput-new text-center" >
+                        <div class="thumbnail img-no-padding img-circle">
+                            <img src={{user.image}} alt="..." />
+                        </div>
+                        <div>
+                            <input type="file" name='profimg' id="imgFile" (change)="onFileChanged($event)" accept="image/*">
+                            <label for="imgFile" class="btn btn-outline-default btn-file btn-round">{{language.caption_changePicture}}</label>
+                            <div>
+                                <button *ngIf="isImage" (click)="updateData('image')"class="btn btn-outline-success btn-file btn-round">{{language.caption_update}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            
+            <div class="row" *ngIf="!isUpdate">
+                <div class="col-md-6 ml-auto mr-auto">
+                    <div align="right">
+                        <button type="button" class="btn btn-outline-default btn-sm btn-just-icon mr-1" placement="bottom" ngbTooltip="Edit Details" (click)="updateDetails('details');">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">{{language.text_userName}}: {{user.name}}</label> 
+                    </div>
+                        
+                    <div class="form-group">
+                        <label class="font-weight-bold">{{language.text_memberSince}}: {{memberSince(user.createdOn)}}</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">{{language.text_email}}: {{user.email}}</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">{{language.text_contact}}: {{user.contact}}</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">{{language.text_country}}: {{user.country}}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" *ngIf="isUpdate">
+                <div class="col-md-6 ml-auto mr-auto">
+                    <h4 class="text-center font-weight-bold">{{language.text_updateDetails}}</h4>
+                    <form class="settings-form"> 
+                        <div class="form-group">
+                            <input type="text" [(ngModel)]="user.name" name="name" class="form-control border-input" placeholder="{{language.text_userName}}">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" [(ngModel)]="user.contact" name="contact" class="form-control border-input" placeholder="{{language.text_contact}}">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" [(ngModel)]="user.country" name="country" class="form-control border-input" placeholder="{{language.text_country}}">
+                        </div>
+
+                        <div class="text-center">
+                            <button type="button" class="btn btn-wd btn-success btn-round mr-1" (click)="updateData('details')">{{language.caption_update}}</button>
+                            <button type="button" class="btn btn-wd btn-danger btn-round mr-1" (click)="updateDetails('notnow');">{{language.caption_notNow}}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row" *ngIf="this.user.regType=='email'">
+                <div class="col-md-6 ml-auto mr-auto">
+                    <div class="pull-right" *ngIf="!isPwd">
+                        <button type="button" class="btn btn-outline-default btn-sm btn-just-icon mr-1" placement="bottom" ngbTooltip="Change Password" (click)="updateDetails('pwd');">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <div *ngIf="!isPwd" class="pull-left"><label class="font-weight-bold">{{language.text_changePassword}}</label></div>
+                    
+                    <div *ngIf="isPwd">
+                        <h4 class="text-center font-weight-bold">{{language.text_changePassword}}</h4>
+                        <br>
+                        <small>{{language.text_note}}: {{language.msg_passwordInst}}</small>
+                        <br><br>
+                        <form [formGroup]="changePwd" (ngSubmit)="changePassword(changePwd)"> 
+                            <!-- <div class="input-group">                            
+                                <input type="password" formControlName="oldPwd" class="form-control border-input" placeholder="{{language.text_oldPassword}}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text {{changePwd.get('oldPwd').status=='VALID'? 'text-success':'text-muted'}}">
+                                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    </span>
+                                </div>                                
+                            </div>   -->
+                            <!-- <div *ngIf="changePwd.get('oldPwd').invalid && (changePwd.get('oldPwd').dirty || changePwd.get('oldPwd').touched)" class="text-danger">
+                                <small *ngIf="changePwd.get('oldPwd').errors.required">{{language.msg_oldPasswordReq}}</small>
+                            </div>      
+                            <br>                -->
+                            <div class="input-group">
+                                <!-- <label>New Password</label> -->
+                                <input type="password" formControlName="newPwd" class="form-control border-input" placeholder="{{language.text_newPassword}}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text {{changePwd.get('newPwd').status=='VALID'? 'text-success':'text-muted'}}">
+                                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    </span>
+                                </div>                                 
+                            </div>
+                            <div *ngIf="changePwd.get('newPwd').invalid && (changePwd.get('newPwd').dirty || changePwd.get('newPwd').touched)" class="text-danger">
+                                <small *ngIf="changePwd.get('newPwd').errors.required">{{language.msg_newPasswordReq}}</small>
+                                <small *ngIf="changePwd.get('newPwd').errors.pattern">{{language.msg_followPasswordPtrn}}</small>
+                            </div>
+                            <br>
+                            <div class="input-group">                            
+                                <input type="password" formControlName="cnfPwd" class="form-control border-input" placeholder="{{language.text_confirmPassword}}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text {{changePwd.get('newPwd').value==changePwd.get('cnfPwd').value && 
+                                        changePwd.get('newPwd').value!='' && changePwd.get('cnfPwd').value!=''? 'text-success':'text-muted'}}">
+                                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                            </div> 
+                            <div *ngIf="changePwd.get('cnfPwd').invalid && (changePwd.get('cnfPwd').dirty || changePwd.get('cnfPwd').touched)" class="text-danger">
+                                <small *ngIf="changePwd.get('cnfPwd').errors.required">{{language.msg_confirmPasswordReq}}</small>
+                                <small *ngIf="changePwd.get('cnfPwd').errors.minlength">{{language.msg_followPasswordPtrn}}</small>
+                            </div>
+                                                        
+                            <br>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-wd btn-success btn-round mr-1" [disabled]="!changePwd.valid || (changePwd.get('newPwd').value!=changePwd.get('cnfPwd').value)">{{language.caption_submit}}</button>
+                                <button type="button" class="btn btn-wd btn-danger btn-round mr-1" (click)="updateDetails('notnow');">{{language.caption_notNow}}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-footer></app-footer>
+
+<!-- 
+
+    <h2>Profile</h2>
+<br>
+<img src="{{user.image}}" alt="Profile image" height="100" width="100">
+<br>  
+Change image  <input type="file" name='profimg' (change)="onFileChanged($event)" accept="image/*">
+ <button (click)="updateData('image')">Update image</button>
+<br>
+<br>
+Username : {{user._id}}
+<br>
+User since  : {{user.createdOn}}
+<br>
+Email id  : {{user.email}}
+<br>
+<br>
+Name  : <input type="text" [(ngModel)]="user.name">  <button (click)="updateData('name')">Update name</button>
+<br> <br>
+
+New password : <input type="password" [(ngModel)]="user.password"> <button (click)="updateData('password')">Reset password</button>
+
+
+ -->

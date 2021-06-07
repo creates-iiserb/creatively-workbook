@@ -1,0 +1,211 @@
+<div class="section section-transparent" *ngIf="language">
+  <!-- <div class="container-fluid">
+    <div class="tab-navset" align="right">
+      <button class="btn {{crrTab=='active-apps'? 'btn-primary':'btn-default'}} tab-nav mr-1" (click)="switchTabs('active-apps')">
+        <i class="fa fa-paper-plane" aria-hidden="true"></i> {{language.caption_active}} {{language.caption_app}} ({{activeCnt}})
+      </button>
+      <button class="btn {{crrTab=='expired-apps'? 'btn-primary':'btn-default'}} tab-nav mr-1" (click)="switchTabs('expired-apps')">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {{language.caption_expired}} {{language.caption_app}} ({{inActiveCnt}})
+      </button>
+      <button class="btn {{crrTab=='beta-apps'? 'btn-primary':'btn-default'}} tab-nav mr-1" (click)="switchTabs('beta-apps')" *ngIf="tds.isBetaUser">
+        <i class="fa fa-user-secret" aria-hidden="true"></i> {{language.text_beta}} {{language.caption_app}} ({{betaCnt}})
+      </button>
+    </div>
+  </div> -->
+  <br> 
+  <div class="container"> 
+    
+    <div class="row">      
+      <div class="col-md-12 ml-auto mr-auto">
+        <div class="nav-tabs-wrapper" id="subList">
+          <div class="row" *ngIf="crrTab=='active-apps'">
+            
+           
+          <app-infocard [ngClass]="'bg-light col-md-12 mw-100 info'"  [options]="{
+            'icon':'nc-icon nc-book-bookmark',
+            'iconType':'icon-primary'
+          }" *ngIf="(subList|wbfilter:'active').length==0">
+            <h4 class="info-title"> Active App </h4>
+            <p>{{language.text_noWbAvail}}</p>
+          </app-infocard>
+           
+
+            <div class="col-md-4 col-sm-6" *ngFor="let sub of subList | wbfilter:'active'">
+              <div class="card card-blog"> 
+                <!-- <div class="ribbon ribbon-top-right"><span>{{sub.subscription.type}}</span></div>                          -->
+                <div class="card-image">
+                  <a href="javascript:void(0)">
+                    <img class="img" src="{{this.cs.getImgUrl()}}{{sub.subscription.pubId}}">
+                  </a>
+                </div>
+                <div class="card-body text-center">                              
+                  <h4 class="card-title">
+                    <a href="javascript:void(0)">{{sub.wbDetails.title}}</a>
+                  </h4>
+                  <div class="card-description">
+                    <small>{{sub.wbDetails.publisher.name}} {{language.text_from}} {{sub.wbDetails.publisher.organization}}</small>            
+                  </div>
+                  
+                  <div class="card-footer">
+                    <div *ngIf="!sub.wbDetails.beta">
+                      <div *ngIf="sub.subscription.validity&&sub.wbDetails.published">  <a class="btn btn-info btn-round btn-sm" routerLink="/home/wb/{{sub.subscription.subId}}">{{language.caption_view}}</a> </div>
+                      <div *ngIf="!sub.subscription.validity">  <a class="btn btn-info btn-round btn-sm">{{language.caption_renew}}</a> </div>
+                    </div>
+                  </div>
+                  
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          
+          <div class="row" *ngIf="crrTab=='expired-apps'">
+
+          <app-infocard [ngClass]="'bg-light col-md-12 mw-100 info'" 
+            [options]="{
+              'icon':'nc-icon nc-book-bookmark',
+              'iconType':'icon-primary'
+            }" *ngIf="(subList|wbfilter:'expired').length==0">
+            <h4 class="info-title"> Expired App </h4>
+            <p>{{language.text_noWbAvail}}</p>
+          </app-infocard>
+
+       
+
+            <!-- <p class="font-weight-bold text-danger" *ngIf="(subList|wbfilter:'expired').length==0">{{language.text_noWbAvail}}</p> -->
+            <div class="col-md-4 col-sm-6" *ngFor="let sub of subList | wbfilter:'expired'">
+              <div class="card card-blog"> 
+                <div *ngIf="sub.wbDetails.beta" class="ribbon ribbon-top-right"><span>{{language.text_beta}} v {{sub.wbDetails.ver}}</span></div>                         
+                <div class="card-image">
+                  <a href="javascript:void(0)">
+                    <img class="img" src="{{this.cs.getImgUrl()}}{{sub.subscription.pubId}}">
+                  </a>
+                </div>
+                <div class="card-body text-center">                              
+                  <h4 class="card-title">
+                    <a href="javascript:void(0)">{{sub.wbDetails.title}}</a>
+                  </h4>
+                  <div class="card-description">
+                    <small>{{sub.wbDetails.publisher.name}} {{language.text_from}} {{sub.wbDetails.publisher.organization}}</small>            
+                  </div>
+                  
+                  <div class="card-footer">
+                    <!-- For Regular Store -->
+                    <div *ngIf="!sub.wbDetails.beta">
+                      <div *ngIf="sub.subscription.validity&&sub.wbDetails.published">  <a class="btn btn-info btn-round btn-sm" routerLink="/home/wb/{{sub.subscription.subId}}">{{language.caption_view}}</a> </div>
+                      <div *ngIf="!sub.subscription.validity">  <a class="btn btn-info btn-round btn-sm" (click)="renewWbSub(sub.subscription.subId)">{{language.caption_renew}}</a> </div>
+                    </div>
+
+                    <!-- For Beta Store -->
+                    <div *ngIf="sub.wbDetails.beta&&sub.subscription.betaAccess==true">
+                      <div *ngIf="sub.subscription.validity">  <a class="btn btn-success btn-round btn-sm" routerLink="/home/wb/{{sub.subscription.subId}}">{{language.caption_view}}</a> </div>
+                      <div *ngIf="!sub.subscription.validity">  
+                        <!-- <a class="btn btn-success btn-round btn-sm">{{language.caption_renew}}</a> -->
+                        <span *ngIf="!sub.subscription.validity  && !sub.update.available; else UpdateAvailForBeta" class="text-danger">{{language.msg_wbBetaRenew}}</span>
+                        <ng-template #UpdateAvailForBeta>
+                          <span class="text-default">{{language.msg_updateAvailForBetaExp}} </span>
+                          <br><br>
+                          <button class="btn btn-sm btn-round btn-primary" (click)="updateWbModel(UpdateNotice,sub.update.updateMsg,sub.subscription.subId);">
+                            {{language.caption_update}}
+                          </button>
+                        </ng-template>
+                      </div>
+                    </div>
+                    <span *ngIf="sub.subscription.type=='beta' && !sub.subscription.betaAccess" class="text-danger">
+                      {{language.msg_noLongerBetaUser}}
+                    </span>
+
+                    <div *ngIf="sub.subscription.betaAccess==false">
+                      <p class="text-danger">{{language.message.notBetaUSer}}</p>
+                    </div>
+                  </div>
+                  
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <div class="row" *ngIf="crrTab=='beta-apps' && tds.isBetaUser">
+            <!-- <p class="font-weight-bold text-danger" *ngIf="(subList|wbfilter:'beta').length==0">{{language.text_noWbAvail}}</p> -->
+
+            <app-infocard  [ngClass]="'bg-light col-md-12 mw-100 info'"  [options]="{
+              'icon':'nc-icon nc-book-bookmark',
+              'iconType':'icon-primary'
+            }" *ngIf="(subList|wbfilter:'beta').length==0">
+              <h4 class="info-title"> Beta App </h4>
+              <p>{{language.text_noWbAvail}}</p>
+            </app-infocard>
+
+
+            <div class="col-md-4 col-sm-6" *ngFor="let sub of subList | wbfilter:'beta'">
+              <div class="card card-blog"> 
+                <div *ngIf="sub.wbDetails.beta" class="ribbon ribbon-top-right"><span>{{language.text_beta}} v {{sub.wbDetails.ver}}</span></div>                         
+                <div class="card-image">
+                  <a href="javascript:void(0)">
+                    <img class="img" src="{{this.cs.getImgUrl()}}{{sub.subscription.pubId}}">
+                  </a>
+                </div>
+                <div class="card-body text-center">                              
+                  <h4 class="card-title">
+                    <a href="javascript:void(0)">{{sub.wbDetails.title}}</a>
+                  </h4>
+                  <div class="card-description">
+                    <small>{{sub.wbDetails.publisher.name}} {{language.text_from}} {{sub.wbDetails.publisher.organization}}</small>            
+                  </div>
+                  
+                  <div class="card-footer">
+                    <div *ngIf="sub.wbDetails.beta&&sub.subscription.betaAccess==true">
+                      <div *ngIf="sub.subscription.validity">  
+                        <a class="btn btn-success btn-round btn-sm mr-1" *ngIf="sub.update.required==false" routerLink="/home/wb/{{sub.subscription.subId}}">{{language.caption_view}}</a>
+                        <button class="btn btn-primary btn-round btn-sm mr-1" *ngIf="sub.update.available&&sub.update.required" (click)="updateWbModel(UpdateNotice,sub.update.updateMsg,sub.subscription.subId);">{{language.caption_update}}</button> 
+                      </div>
+                      <div *ngIf="!sub.subscription.validity">  
+                        <a class="btn btn-success btn-round btn-sm mr-1">{{language.caption_renew}}</a> 
+                        <button class="btn btn-primary btn-round btn-sm mr-1" *ngIf="sub.update.available&&sub.update.required" (click)="updateWbModel(UpdateNotice,sub.update.updateMsg,sub.subscription.subId);">{{language.caption_update}}</button>
+                      </div>
+                      
+                    </div>
+                    <div *ngIf="sub.subscription.betaAccess==false">
+                      <p class="text-danger">{{language.message.notBetaUSer}}</p>
+                    </div>
+
+                  </div>                         
+                  
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+</div>  
+
+<ng-template #UpdateNotice let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h5 class="font-weight-bold modal-title">{{language.text_updateAvail}}</h5>
+    <button type="button" class="close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="instruction">
+      <div class="row">
+        <div class="col-md-12">
+          <p *ngIf="updateDetails">
+            <app-math [content]="updateDetails['msg']"></app-math>
+          </p>
+        </div>
+      </div>
+    </div>      
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-link" (click)="updateWb(updateDetails['subId']);c('Close click')">{{language.caption_update}}</button>
+  </div>
+</ng-template>
+

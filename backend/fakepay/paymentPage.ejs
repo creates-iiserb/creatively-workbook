@@ -1,0 +1,16 @@
+<form action="<%-callbackurl%>" method="POST" enctype="application/json" name="f1">
+    <input type="hidden" name="status" id="status" value="true">
+    <input type="hidden" name="data" id="data" value="<%-data%>">
+    <button type="submit">Success txn</button>
+</form>
+
+<form action="<%-callbackurl%>" method="POST" enctype="application/json" name="f2">
+    <input type="hidden" name="status" id="status" value="false">
+    <input type="hidden" name="data" id="data" value="<%-data%>">
+    <button type="submit">Failed txn</button>
+</form>
+<!-- <script type="text/javascript">document.f1.submit();</script> -->
+
+
+
+

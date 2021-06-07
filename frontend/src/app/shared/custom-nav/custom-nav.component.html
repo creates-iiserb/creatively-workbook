@@ -1,0 +1,76 @@
+<nav class="navbar navbar-expand-lg fixed-top nav-top" color-on-scroll="500">
+        <div class="container-fluid">
+            <div class="navbar-translate">
+                <div class="navbar-header">
+                    <a class="navbar-brand" *ngIf="this.cs.getUsrProfileData() && this.cs.getUsrProfileData()['user']!=null">
+                        <img class="img-circle" src="{{userImg}}{{this.cs.getUsrProfileData().user}}" alt="{{this.cs.getUsrProfileData().name}}" title="{{this.cs.getUsrProfileData().user.split('@')[0]}}" width="30" height="30"></a>
+                </div>
+                <button class="navbar-toggler navbar-burger" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation" (click)="sidebarToggle()">
+                    <span class="navbar-toggler-bar bar1"></span>
+                    <span class="navbar-toggler-bar bar2"></span>
+                    <span class="navbar-toggler-bar bar3"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">  
+                    <!-- <div class="nav-item" id="home" *ngIf="this.cs.checkIfUserIsLoggedIn()">
+                        <a class="nav-link" [routerLink]="['/home/library']" (click)="activeMenu('home')">
+                            <i class="fa fa-server"></i> {{this.tds.language.caption_library}}
+                        </a>
+                    </div> -->
+                    <div ngbDropdown class="nav-item dropdown" *ngIf="this.cs.checkIfUserIsLoggedIn()">
+                        <div class="nav-link dropdown-toggle" ngbDropdownToggle id="home">
+                            <i *ngIf="currLibMenu=='active-apps'" class="fa fa-paper-plane"></i>
+                            <i *ngIf="currLibMenu=='expired-apps'" class="fa fa-exclamation-triangle"></i>
+                            <i *ngIf="currLibMenu=='beta-apps'" class="fa fa-user-secret"></i>
+                            {{this.tds.language.caption_library}}</div>
+                        <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right dropdown-danger">
+                            <a ngbDropdownItem [routerLink]="['/home/library']" (click)="currLibTab('active-apps')">
+                                <span class="{{currLibMenu=='active-apps'? 'text-danger':''}}"><i class="fa fa-paper-plane"></i> {{this.tds.language.caption_active}} {{this.tds.language.caption_app}}</span>
+                            </a>
+                            <a ngbDropdownItem [routerLink]="['/home/library']" (click)="currLibTab('expired-apps')">
+                                <span class="{{currLibMenu=='expired-apps'? 'text-danger':''}}"><i class="fa fa-exclamation-triangle"></i> {{this.tds.language.caption_expired}} {{this.tds.language.caption_app}}</span>
+                            </a>
+                            <a *ngIf="this.tds.getBetaUser()" ngbDropdownItem [routerLink]="['/home/library']" (click)="currLibTab('beta-apps')">
+                                <span class="{{currLibMenu=='beta-apps'? 'text-danger':''}}"><i class="fa fa-user-secret"></i> {{this.tds.language.caption_beta}} {{this.tds.language.caption_app}}</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="nav-item" id="store">
+                        <a class="nav-link" [routerLink]="['/store']" (click)="activeMenu('store')">
+                            <i class="fa fa-shopping-cart"></i> {{this.tds.language.caption_store}}
+                        </a>
+                    </div>
+                    <div class="nav-item" id="betaStore" *ngIf="this.cs.checkIfUserIsLoggedIn()&&this.tds.getBetaUser()">
+                        <a class="nav-link" [routerLink]="['/store/beta']" (click)="activeMenu('betaStore')">
+                            <i class="fa fa-shopping-cart"></i> {{this.tds.language.caption_betaStore}}
+                        </a>
+                    </div> 
+                    <!-- <div class="nav-item">
+                        <a class="nav-link" [routerLink]="['/quiz']">
+                            <i class="nc-icon nc-cart-simple"></i> Quiz
+                        </a>
+                    </div> -->
+                    <div class="nav-item" id="login" *ngIf="!this.cs.checkIfUserIsLoggedIn()">
+                        <a class="nav-link" [routerLink]="['/account/login']" (click)="activeMenu('login')">
+                            <i class="fa fa-sign-in"></i> {{this.tds.language.caption_login}}
+                        </a>
+                    </div>  
+
+                    <div class="nav-item" id="signUp" *ngIf="!this.cs.checkIfUserIsLoggedIn()">
+                        <a class="nav-link" [routerLink]="['/account/signup']" (click)="activeMenu('signUp')">
+                            <i class="fa fa-sign-in"></i> {{this.tds.language.caption_signUp}}
+                        </a>
+                    </div>
+                    
+                    <div ngbDropdown class="nav-item dropdown" *ngIf="this.cs.checkIfUserIsLoggedIn()">
+                        <div class="nav-link dropdown-toggle" ngbDropdownToggle id="settings"><i class="fa fa-cog"></i> {{this.tds.language.caption_settings}}</div>
+                        <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right dropdown-danger">
+                            <a ngbDropdownItem [routerLink]="['/home/profile']"><i class="fa fa-user"></i>{{this.tds.language.caption_profile}}</a>
+                            <a ngbDropdownItem (click)="this.cs.logoutAndRedirectToLogin()"><i class="fa fa-sign-out"></i>{{this.tds.language.caption_logout}}</a>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </nav>

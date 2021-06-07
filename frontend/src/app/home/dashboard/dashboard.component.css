@@ -1,0 +1,30 @@
+/* .nav-tabs {
+    background: #fff !important;
+    border-bottom: 3px solid #212529 !important;
+}
+
+.nav-tabs .nav-item .nav-link.active:after, 
+.nav-tabs .nav-item .nav-link.active:hover:after, 
+.nav-tabs .nav-item .nav-link.active:focus:after {
+    border-bottom: 11px solid #212529 !important;
+} */
+
+.card img {
+    min-width:100% !important;
+}
+
+.tab-nav {
+    font-size: 0.8em !important;
+    padding: 5px 5px !important;
+}
+
+@media only screen and (max-width:420px) {
+    .tab-navset {
+        text-align: center !important;
+    }
+
+    .tab-nav {
+        font-size: 0.7em !important;
+        padding: 3px 5px !important;
+    }
+}

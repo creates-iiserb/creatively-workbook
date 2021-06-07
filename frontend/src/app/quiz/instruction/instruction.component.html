@@ -1,0 +1,160 @@
+<div class="section">
+  <div class="container">      
+    <div class="container" *ngIf="QuizMetaData">
+      <div align="center">
+        <h4 class="font-weight-bold"><app-math [content]="QuizMetaData.wsTitle"></app-math></h4>
+        <span class="badge badge-pill badge-success mr-1" *ngIf="isBetaUser" style="text-transform: none;">{{language.text_beta}} {{language.text_worksheet}}</span>
+      </div>
+      <br><br>
+
+      <div class="card card-blog">
+        <div class="card-body">
+          <div>
+            <span class="pull-right mr-1 font-weight-bold text-default">{{wbData.mode=='certification'? language.text_duration:language.text_suggestedDuration}} : {{wbData.duration}} {{language.text_min}}</span>
+            <span class="pull-left mr-1 font-weight-bold text-default">{{language.text_mode}} : {{wbData.mode}}</span>
+          </div>
+          <div class="clearfix"></div>
+          <div align="center">
+            <h5 class="font-weight-bold text-default">{{language.text_instruction}}</h5>        
+          </div>      
+          <br>
+          <app-math [content]="QuizMetaData.wsInstr"></app-math>
+        </div>
+      </div>
+
+      <br>
+      <div class="card card-blog">
+        <div class="card-body">
+          <div align="center"><h5 class="font-weight-bold text-default">{{language.text_gradingMatrix}}</h5></div>
+          <div>
+            <table class="table grading-tbl" style="border:#ccc5b8 1px solid;border-radius:5px;">
+              <thead>
+                <tr>
+                  <th width="15%"></th>
+                  <th class="bg-primary">{{QuizMetaData.wshelpAllowed>0? language.text_noHelpUsed:''}}</th>
+                  <th *ngIf="QuizMetaData.wshelpAllowed>=1"  class="bg-info">{{language.text_hintUsed}}</th>
+                  <th *ngIf="QuizMetaData.wshelpAllowed==2"  class="bg-success">{{language.text_expUsed}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="text-default">{{language.text_correctScore}}</th>
+                  <td  class="bg-primary">
+                    {{QuizMetaData.wsGradingMatrix[0][0]}}
+                  </td>
+                  <td  class="bg-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                    {{QuizMetaData.wsGradingMatrix[0][1]}}
+                  </td>
+                  <td  class="bg-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                    {{QuizMetaData.wsGradingMatrix[0][2]}}
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-default">{{language.text_skipScore}}</th>
+                  <td  class="bg-primary">
+                    {{QuizMetaData.wsGradingMatrix[1][0]}}
+                  </td>
+                  <td  class="bg-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                    {{QuizMetaData.wsGradingMatrix[1][1]}}
+                  </td>
+                  <td  class="bg-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                    {{QuizMetaData.wsGradingMatrix[1][2]}}
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-default">{{language.text_incorrectScore}}</th>
+                  <td  class="bg-primary">
+                    {{QuizMetaData.wsGradingMatrix[2][0]}}
+                  </td>
+                  <td  class="bg-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                    {{QuizMetaData.wsGradingMatrix[2][1]}}
+                  </td>
+                  <td  class="bg-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                    {{QuizMetaData.wsGradingMatrix[2][2]}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="pull-left" *ngIf="QuizMetaData.free && !isBetaUser">
+        <span class="card-category font-weight-bold text-default">{{language.text_freeAllowance}}-</span>&nbsp;&nbsp;&nbsp;
+        <span class="card-category font-weight-bold text-primary">{{language.text_item}}: {{QuizMetaData.free.items}}</span>&nbsp;&nbsp;&nbsp;
+        <span class="card-category font-weight-bold text-info">{{language.text_hint}}: {{QuizMetaData.free.hints}}</span>&nbsp;&nbsp;&nbsp;
+        <span class="card-category font-weight-bold text-warning">{{language.text_explanation}}: {{QuizMetaData.free.explanations}}</span>
+      </div>
+
+      <br><br>
+      <div *ngIf="wbData.mode=='lesson' && wbData['response'].resume==false"><span class="font-weight-bold">{{language.text_info}}:</span> {{language.msg_lessionInfo}}<br><br></div>
+      <div class="row">
+        
+        <div class="col-md-4" *ngIf="wbData.mode!='certification'">
+          <div *ngIf="wbData['response'].resume==false; else selectedDuration">
+            <span class="font-weight-bold">{{language.text_selectDuration}}:</span> &nbsp;&nbsp;<span class="font-weight-bold text-success">{{wbData.selectedDur}} {{language.text_min}}.</span>
+            <br><br>
+            <div class="d-flex">
+              <span class="font-weight-bold mr-2">{{minDuration(wbData.duration)}}</span>
+              <form class="range-field w-55">
+                <input class="custom-range" [(ngModel)]="wbData.selectedDur" name="selectedDur" id="duration" type="range" min="{{minDuration(wbData.duration)}}" max="{{maxDuration(wbData.duration)}}" step="1"/>
+              </form>
+              <span class="font-weight-bold ml-2">{{maxDuration(wbData.duration)}} {{language.text_min}}</span>
+            </div>
+            <br>
+          </div>
+          <ng-template #selectedDuration> 
+            <span class="font-weight-bold">{{language.text_selectedTime}}:</span> &nbsp;&nbsp;<span class="font-weight-bold text-success">{{wbData['response'].duration}} {{language.text_min}}.</span>
+          </ng-template>
+        </div>
+
+        <div class="col-md-4"  *ngIf="wbData.mode!='certification'">
+          <div *ngIf="wbData.mode!='quiz' && wbData['response'].resume==false">
+            <span class="font-weight-bold">{{language.text_selectMode}}:</span>
+            <br>
+            <div class="d-flex my-2" style="padding-top: 10px;">                             
+              <span class="form-check-radio">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" [(ngModel)]="wbData.quizMode" name="quizMode" id="lesson" value="lesson">
+                  {{language.text_lesson}}
+                  <span class="form-check-sign"></span>
+                </label>
+              </span>
+              &nbsp;&nbsp;
+              <span class="form-check-radio">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" [(ngModel)]="wbData.quizMode" name="quizModeS" id="quiz" value="quiz">
+                  {{language.text_quiz}}
+                  <span class="form-check-sign"></span>
+                </label>
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="wbData.mode!='quiz' && wbData['response'].resume==true">
+            <span class="font-weight-bold">{{language.text_selectedMode}}:</span> &nbsp;&nbsp;<span class="font-weight-bold text-success">{{wbData['response'].mode}}</span>
+          </div>
+        </div>
+
+        <!-- For Certificatation mode only -->
+        <div class="col-md-8 text-default" *ngIf="wbData.mode=='certification'">
+          <span class="font-weight-bold">Note: </span><b>Your clock starts ticking after you click on START for the first time. It ticks even when you are not logged in.</b>
+        </div>
+
+        <div class="col-md-4"> 
+          <br>
+          <div class="start-btn">
+            <a routerLink="/home/wb/{{wbData.subId}}" class="btn btn-move-right btn-round btn-success mr-1"><i class="nc-icon nc-minimal-left"></i> {{language.caption_back}} </a>
+            <button class="btn btn-move-right btn-round btn-success" (click)="playQuiz()">{{isReview==true? language.caption_review:language.caption_start}} <i class="nc-icon nc-minimal-right"></i></button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pull-right">
+        <!-- <a routerLink="/home/wb/{{wbData.subId}}" class="btn btn-move-right btn-round btn-success mr-1"><i class="nc-icon nc-minimal-left"></i> {{language.caption_back}} </a>
+        <button class="btn btn-move-right btn-round btn-success" (click)="playQuiz()">{{isReview==true? language.caption_review:language.caption_start}} <i class="nc-icon nc-minimal-right"></i></button> -->
+      </div>
+
+    </div>
+  </div>
+</div>

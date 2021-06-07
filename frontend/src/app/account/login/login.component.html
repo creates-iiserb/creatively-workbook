@@ -1,0 +1,33 @@
+<div class="wrapper" style="margin-left:-15px;margin-right:-15px;" *ngIf="language">
+  <div class="page-header">
+    <div class="filter"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-sm-6 ml-auto mr-auto">
+          <div class="card card-register ml-auto mr-auto">
+            <h3 class="card-title text-center">{{language.text_userLogin}}</h3>
+            <br>
+            
+            <form class="register-form">
+              <input type="email" [(ngModel)]="user.wbuser" name="wbuser" class="form-control" placeholder="{{language.text_email}}">
+              <input type="password" [(ngModel)]="user.password" name="password" class="form-control" placeholder="{{language.text_password}}">
+              <button class="btn btn-block btn-round" (click)="attemptLogin()">Login</button>
+            </form>
+            <div class="division">
+              <div class="line l"></div>
+              <span>{{language.text_or}}</span>
+              <div class="line r"></div>
+            </div>
+            <button href="javascript:void(0)" class="btn btn-round btn-block btn-google" (click)="signInWithGoogle()"><i class="fa fa-google"></i> {{language.caption_google}}</button> 
+            <!-- <button href="javascript:void(0)" class="btn btn-just-icon btn-facebook mr-1" (click)="signInWithFB()"><i class="fa fa-facebook"></i></button> -->
+                            
+            <div class="login">
+              <p><a href="javascript:void(0)" routerLink="/account/reset" class="text-muted">{{language.text_forgotPassword}}</a></p>
+              <p>{{language.text_doNotHaveAcc}}? <a href="javascript:void(0)" routerLink="/account/signup" class="text-muted">{{language.caption_signUp}}</a>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

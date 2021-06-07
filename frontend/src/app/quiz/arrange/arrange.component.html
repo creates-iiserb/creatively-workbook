@@ -1,0 +1,12 @@
+<br>
+<!-- Question Here -->
+<div class="qus-txt">
+  <app-math [content]="QusData.question"></app-math>
+</div>
+<br>
+<!-- Items Here --> 
+<div cdkDropList class="arrange-list {{quizRes.lock||isReview==true? 'card-quiz':''}}" (cdkDropListDropped)="drop($event)">
+  <div class="arrange-box" *ngFor="let item of items" cdkDrag>
+    <app-math [content]="QusData.items[item-1].stmt"></app-math>
+  </div>
+</div>

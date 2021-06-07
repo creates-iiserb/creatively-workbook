@@ -1,0 +1,26 @@
+.btn-google {
+    margin-top: 0 !important;
+}
+.page-header {
+    /* background: url('/assets/img/workbook/login-bg13.png') no-repeat, #b6c3d096; */
+    background: url('/assets/img/workbook/login-bg18.png') no-repeat, #b6c3d096;
+    background-blend-mode: normal;
+    background-position: center center;
+    background-size: cover;
+}
+
+.page-header .filter::after {
+    /* background-color: rgba(0, 0, 0, 0.05) !important; */
+    background-color: unset !important;
+}
+
+.card {
+    box-shadow: 0 0 260px #fff !important;
+    background: border-box !important;
+}
+
+@media only screen and (max-width: 767px) {
+    .login-left-side {
+        display: none !important;
+    }
+}

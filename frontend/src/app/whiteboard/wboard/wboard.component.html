@@ -1,0 +1,13 @@
+<!-- <div align="center">
+    <button class="btn btn-sm btn-just-icon btn-success mr-1" (click)="addImg()"><i class="fa fa-picture-o" aria-hidden="true"></i></button>
+    <button *ngIf="delShape==true" class="btn btn-sm btn-just-icon btn-danger mr-1" (click)="delSelectedShape()"><i class="fa fa-trash" aria-hidden="true"></i></button>
+</div>
+<br> -->
+
+<p><span class="text-default" *ngIf="language && wBoardData['data']['snapshot']"><small> {{language.text_maxShapeAllowed}}: {{wBoardData['data']['snapshot']['shapes'].length}}/30</small></span></p>
+<div class="wboard" id="wboard"></div>
+<div class="wboard-bottom">
+    <button class="pull-right btn btn-sm btn-success btn-round pull-right" (click)="addDrwaing()">{{wBoardData.type=='new'? 'Add':'Done'}}</button>
+    <span *ngIf="delShape==true" class="pull-left" (click)="delSelectedShape()"><i class="fa fa-trash" aria-hidden="true"></i></span>
+    <div class="clearfix"></div>
+</div>

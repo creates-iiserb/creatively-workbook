@@ -1,0 +1,204 @@
+
+<div class="section header" *ngIf="wbDetails && language"> 
+  <div class="container-fluid section-lightgray">
+      <br>
+    <div class="row">
+      <div class="col-md-10 ml-auto mr-auto"> 
+        <div class="card card-plain card-blog">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="card-image" align="center">
+                <img class="img" src="{{this.cs.getImgUrl()}}{{wbDetails.pubId}}" />
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="card-body">
+                <!-- <h6 class="card-category text-info">Enterprise</h6> -->
+                <h3 class="card-title">
+                  {{wbDetails.title}}
+                </h3>
+                <p class="card-description">
+                  {{wbDetails.publisher.organization}} <br>
+                  {{wbDetails.publisher.name}}
+                </p>
+                <br>
+                
+                <h6>                          
+                  <span class="mr-1"><b>{{language.text_difficulty}}: {{wbDetails.category.level}}</b></span>&nbsp;&nbsp;
+                  <span class="mr-1"><b>{{language.text_language}}: {{wbDetails.category.language}}</b></span>&nbsp;&nbsp;
+                  <span class="mr-1"><b>{{language.text_version}}: {{wbDetails.latestVer}}</b></span>
+                </h6>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div> 
+
+
+    <div *ngIf="wbDetails">
+      <div class="container-fluid">
+          <div class="row">        
+          <div class="col-md-6">
+            <div>
+              <!-- <h4><b>{{language.text_desc}}</b></h4> -->
+              <br>
+              <ngb-tabset>
+                <ngb-tab title="{{language.text_desc}}">
+                  <ng-template ngbTabContent>
+                    <div class="store-desc">
+                      <app-math [content]="wbDetails.description"></app-math>
+                    </div>
+                  </ng-template>
+                </ngb-tab>
+                <ngb-tab title="{{language.text_authorDetails}}" *ngIf="wbDetails.publisher">
+                  <ng-template ngbTabContent>
+                    
+                    <div class="store-desc">
+                      <img *ngIf="wbDetails.publisher.photoURL" src="{{wbDetails.publisher.photoURL}}" class="img-thumbnail" alt="" width="200">
+                      <p *ngIf="wbDetails.publisher.name">{{wbDetails.publisher.name}}</p>
+                      <p *ngIf="wbDetails.publisher.designation">{{wbDetails.publisher.designation}}</p>
+                      <p *ngIf="wbDetails.publisher.organization">{{wbDetails.publisher.organization}}</p>
+                      <p *ngIf="wbDetails.publisher.areaOfExp && wbDetails.publisher.areaOfExp.length!=0"><b>{{language.text_areaOfExp}}:</b> {{wbDetails.publisher.areaOfExp.join(', ')}}</p>
+                      <h4 *ngIf="wbDetails.publisher.aboutPublisher"><b>{{language.text_about}}</b></h4>
+                      <br>
+                      <p *ngIf="wbDetails.publisher.aboutPublisher" class="about-author">{{wbDetails.publisher.aboutPublisher}}</p>
+                    </div>
+                  </ng-template>
+                </ngb-tab>
+              </ngb-tabset>
+              
+            </div>
+            <!-- <div align="right">
+            <button class="btn btn-sm btn-round btn-danger">Read More</button>
+            </div> -->
+          </div>
+
+          <div class="col-md-6">
+              <!-- <div class="row">
+              <div class="container">
+                  <h2 class="title">Your life will be much easier</h2>
+              </div>
+              </div> -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info info-horizontal wb-info-card">
+                  <div class="icon icon-success">
+                    <i class="nc-icon nc-layout-11"></i>
+                  </div>
+                  <div class="description">
+                    <h4 class="info-title">{{language.text_content}}</h4>
+                    <p>
+                      {{wbContent.noOfWs}} {{language.text_wbContentTxt1}}<br>{{wbContent.freeItems}} {{language.text_wbContentTxt2}}<br>
+                      {{wbContent.freeHint>0||wbContent.freeExp>0? language.text_wbContentTxt3:''}}
+                    </p>  
+                      <!-- <a href="javascript:void(0)" class="btn btn-link">See more</a> -->
+                  </div>
+                </div>
+                <div class="info info-horizontal wb-info-card">
+                  <div class="icon icon-warning">
+                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                  </div>
+                  <div class="description">
+                    <h4 class="info-title">{{language.text_duration}}</h4>
+                    <p class="font-weight-bold">~ {{wbContent.suggDur}} {{language.text_totalTime}}</p>
+                    <!-- <a href="javascript:void(0)" class="btn btn-link">See more</a> -->
+                  </div>
+                </div>
+                
+              </div>
+              <div class="col-md-6">
+
+                <div class="info info-horizontal wb-info-card">
+                  <div class="icon icon-warning">
+                    <i class="nc-icon nc-bank"></i>
+                  </div>
+                  <div class="description">
+                    <h4 class="info-title">{{language.text_relevance}}</h4>
+                    <p>{{wbDetails.category.subject.join(', ')}}</p>
+                    <p>{{wbDetails.category.relevance.join(', ')}}</p>
+                    <!-- <a href="javascript:void(0)" class="btn btn-link">See more</a> -->
+                  </div>
+                </div>
+
+                <div class="info info-horizontal wb-info-card">
+                  <div class="icon icon-danger">
+                      <i class="nc-icon nc-bag-16" aria-hidden="true"></i>
+                  </div>
+                  <div class="description">
+                    <h4 class="info-title">{{language.text_subscriptions}}</h4>
+                    <p>{{language.text_period}}: {{wbDetails.pricing.period}}</p>
+                    <p>{{language.text_price}}: {{wbDetails.pricing.currency}} {{wbDetails.pricing.price}}</p>
+                    <div>
+                    <!-- <span *ngIf="wbListId['wblist'].indexOf(wbDetails.betaId)>-1; else getBtn" class="badge badge-pill badge-success mr-1">{{language.text_subscribed}}</span> -->
+                    <div *ngIf="wbListId['wblist'] && wbListId['wblist'].indexOf(wbDetails.betaId)>-1; else getBtn">
+                      <span class="badge badge-pill badge-success mr-1">{{language.text_subscribed}}</span>
+                      <br>
+                      &nbsp;&nbsp;<a routerLink="/home/wb/{{wbListId['wbDets'][wbDetails.betaId]}}" class="btn btn-sm btn-round btn-primary btn-link">Go to workbook page</a>
+                    </div>
+                    <ng-template #getBtn>
+                        <button class="btn btn-round btn-sm btn-danger" style="margin-left: 0;" (click)="getBetaWorkbook()">{{language.caption_getWb}}</button>
+                    </ng-template>
+                    </div>
+                    <!-- <a href="javascript:void(0)" class="btn btn-round btn-danger">See more</a> -->
+                  </div>
+                </div>
+                <!-- <div class="info info-horizontal wb-info-card">
+                  <div class="icon icon-primary">
+                    <i class="nc-icon nc-delivery-fast"></i>
+                  </div>
+                  <div class="description">
+                    <h4 class="info-title">{{language.text_fastPrototyping}}</h4>
+                    <p>Medium has a new head of product, while the startup behind the defunct texting app...</p>
+                    <a href="javascript:void(0)" class="btn btn-link">{{language.caption_seeMore}}</a>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          </div>
+      </div> 
+      <br>
+      <div class="section-image wsbg1">
+          <div class="container">
+          <div class="row">
+              <div class="col-md-8 ml-auto mr-auto text-center">
+              <h2 class="title">{{language.text_worksheets}}</h2>
+              <h5 class="description">&nbsp;</h5>
+              </div>
+          </div>                     
+          <div class="row">
+              <div class="col-md-4" *ngFor="let ws of wbDetails.worksheets;let i = index">
+              <div class="card card-blog">
+                  
+                  <div class="card-body">
+                  <h6 class="card-category {{ws.mode=='quiz'? 'text-info':'text-success'}}">{{ws.mode}}</h6>
+                  <h5 class="card-title">
+                      <a href="javascript:void(0)">{{ws.title}}</a>
+                  </h5>
+                  <div class="card-description store-card-desc">
+                    <app-math [content]="ws.descr"></app-math> <br/>
+                  </div>
+                  <hr>
+                  <div class="card-footer">
+                      <div class="author">                                       
+                      <!-- by <a href="javascript:void(0)"><b>Creates</b></a>, IISERB -->
+                      </div>
+                      <div class="stats">
+                      <i class="fa fa-clock-o" aria-hidden="true"></i> {{ws.time}} {{language.text_min}}.
+                      </div>
+                  </div>
+                  </div>
+              </div>
+              </div>
+          </div>
+          </div>
+      </div>
+    </div>
+</div>
+
+
+
+

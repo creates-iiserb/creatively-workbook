@@ -1,0 +1,107 @@
+
+<div class="wrapper" *ngIf="language">
+    <div class="page-header">
+        <div class="filter"></div>
+            <div class="container">
+                <br><br><br><br><br>
+                <div class="row">
+                    <!-- <div class="col-lg-6 col-md-6 col-sm-7 col-12 ml-auto">
+                        <div class="info info-horizontal">
+                            <div class="icon">
+                                <i class="nc-icon nc-paper"></i>
+                            </div>
+                            <div class="description">
+                                <h3> {{language.text_regToWb}} </h3>
+                                <p>{{language.text_regToWbMsg1}}</p>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- <div class="col-lg-6 col-md-6 col-sm-5 col-12 mr-auto ml-auto"> -->
+                    <div class="col-md-5 col-sm-6 ml-auto mr-auto">
+                        <div class="card reg-card">
+                            <h3 class="card-title text-center">{{language.text_regNewUser}}</h3>
+                            <!-- <div class="social">
+                                <button href="javascript:void(0)" class="btn btn-just-icon btn-facebook mr-1"><i class="fa fa-facebook"></i></button>
+                                <button href="javascript:void(0)" class="btn btn-just-icon btn-google mr-1"><i class="fa fa-google"></i></button>
+                                <button href="javascript:void(0)" class="btn btn-just-icon btn-twitter mr-1"><i class="fa fa-twitter"></i></button>
+                            </div>
+
+                            <div class="division">
+                                <div class="line l"></div>
+                                <span>or</span>
+                                <div class="line r"></div>
+                            </div> -->
+                            <hr>
+                            <div>{{response}}</div>
+                            <form [formGroup]="newUser">
+                                <input formControlName="name" type="text" class="form-control" placeholder="{{language.text_fullName}}">
+                                <br>
+                                <div class="input-group">
+                                    <input formControlName="wbuser" type="email" class="form-control border-input" placeholder="{{language.text_email}}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text {{newUser.get('wbuser').status=='VALID'? 'text-success':'text-muted'}}">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>  
+                                </div>
+                                <div class="text-danger" *ngIf="newUser.get('wbuser').invalid && (newUser.get('wbuser').dirty || newUser.get('wbuser').touched)">
+                                    <small>{{language.msg_invalidEmail}}</small>
+                                </div>
+                                <br>
+                                <small class="pwdmsg text-muted">{{language.msg_passwordInst}}</small>
+                                <br><br>
+                                <div class="input-group">
+                                    <input type="password" formControlName="password" name="upwd" class="form-control border-input" placeholder="{{language.text_password}}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text {{newUser.get('password').status=='VALID'? 'text-success':'text-muted'}}">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>  
+                                </div>
+                                <div class="text-danger" *ngIf="newUser.get('password').invalid && (newUser.get('password').dirty || newUser.get('password').touched)">
+                                    <small>{{language.msg_pwdRequirement}}</small>
+                                </div>
+                                <br>
+                                <div class="input-group">
+                                    <input type="password" formControlName="cnfPassword" name="cpwd" class="form-control border-input" placeholder="{{language.text_confirmPassword}}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text {{newUser.get('cnfPassword').status=='VALID'&&newUser.get('cnfPassword').value==newUser.get('password').value? 'text-success':'text-muted'}}">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-danger" *ngIf="newUser.get('cnfPassword').invalid && newUser.get('cnfPassword').value!=newUser.get('password').value">
+                                    <small>{{language.msg_pwdNotMatched}}</small>
+                                </div>
+                                <br>
+                                <div class="input-group">
+                                    <select name="country" class="form-control border-input" formControlName="country">
+                                        <option value="">{{language.text_country}}</option>
+                                        <option *ngFor="let cntry of country;" value="{{cntry.name}}">{{cntry.name}}</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text {{newUser.get('country').status=='VALID'? 'text-success':'text-muted'}}">
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-danger" *ngIf="newUser.get('country').invalid && (newUser.get('country').dirty || newUser.get('country').touched)">
+                                    <small>{{language.text_invalidField}}</small>
+                                </div>
+                                <br><br>
+                                <!-- <div align="center" class="text-danger font-weight-bold" *ngIf="newUser.invalid && newUser.dirty">{{language.msg_satisfyAllFields}}</div> -->
+                                <button *ngIf="!newUser.invalid && newUser.get('cnfPassword').value==newUser.get('password').value" class="btn btn-block btn-round" (click)="signUp()">{{language.caption_register}}</button>
+                            </form>
+                            <div class="login">
+                                <p>{{language.text_alreadyHaveAcc}}? <a href="javascript:void(0)" [routerLink]="['/account/login']">{{language.caption_logIn}}</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <div class="demo-footer text-center">
+                <h6>&copy; {{data | date: 'yyyy'}} by Examineer</h6>
+        </div>
+    </div>
+</div>
+

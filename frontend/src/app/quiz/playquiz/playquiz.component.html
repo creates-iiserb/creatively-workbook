@@ -1,0 +1,1147 @@
+<div *ngIf="QuizData && QuizRes">
+
+    <div class="section">
+      <div class="container-fluid">
+        
+        <nav class="navbar navbar-expand-lg fixed-top nav-top" color-on-scroll="500">
+          <div class="container-fluid">
+            <div class="disply-clock font-weight-bold {{timeAlert? 'text-danger':''}}" *ngIf="quizClock && !isReview">
+              <span  title="{{language.title_clock}}"><i class="nc-icon nc-time-alarm"  (click)="toggleTime()"></i></span>&nbsp;
+              <span (click)="toggleTime()" *ngIf="toggleClock<2">
+                {{(quizClock.hh<10&&quizClock.hh>-1)? '0'+quizClock.hh: quizClock.hh}}:{{quizClock.mm<10? '0'+quizClock.mm: quizClock.mm}}:{{quizClock.ss<10? '0'+quizClock.ss: quizClock.ss}}
+              </span>
+            </div>
+            <div class="disply-clock font-weight-bold" *ngIf="isReview==true">
+              <i class="nc-icon nc-time-alarm"></i>&nbsp;
+              <span>{{QuizData['response']['summary'].time | parsetime}}</span>
+            </div>
+            <div class="navbar-translate">
+              <div class="navbar-header">            
+                <a class="navbar-brand" title="{{QuizMetaData.wsTitle}}">{{QuizMetaData.wsTitle | slice:0:20 }}{{QuizMetaData.wsTitle.length>20? '...':''}}</a>
+              </div>
+            </div>
+            <div class="collapse navbar-collapse">
+              <ul class="navbar-nav ml-auto">            
+                <li class="nav-item">
+                  <button class="btn btn-just-icon" [disabled]="QP==0" (click)="prev()">
+                    <b><i class="nc-icon nc-minimal-left"></i></b> 
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button class="btn btn-just-icon" [disabled]="QP==QuizData.elements.length-1" (click)="next()">
+                    <b><i class="nc-icon nc-minimal-right"></i></b>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        <!--  -->
+        <br>
+  
+        <div class="row"> 
+          <!-- left panel -->
+          <div class="col-md-9" id="quiz-qus">      
+              <!-- Template -->
+              <div class="card">
+                <div class="card-body">
+                  <div class="pull-right" align="right">
+                    <span class="{{QuizRes[QP].review==0? 'text-muted':'text-danger'}} mr-1" title="{{QuizRes[QP].review==0? language.title_qusFlagged:''}}">
+                      <i class="fa fa-flag" aria-hidden="true"></i>
+                    </span>
+                    &nbsp;
+                    <span *ngIf="QuizRes[QP].lock" class="text-success"  title="{{QuizRes[QP].lock? language.title_ansLocked:''}}">
+                      <i class="fa fa-lock" aria-hidden="true"></i>
+                    </span>            
+                    <span *ngIf="!QuizRes[QP].lock" class="text-muted">
+                      <i class="fa fa-unlock-alt" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <!-- <h6 class="card-category {{qType=='mcq'? 'text-info':qType=='arrange'?'text-success':qType=='info'? 'text-danger':'text-warning'}}"> -->
+                  <h6 class="card-category text-primary">
+                    {{QP+1}}.&nbsp;<span class="qus-type">{{qType=='info' && (QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0)? QuizData.elements[QP].object.style:qType}}</span>
+                    <span *ngIf="isReview!=true" class="learn-info" (click)="learnHowTo(LearnHowTo);">&nbsp; {{language.text_howToAns}}</span>
+                  </h6>
+                  
+                  
+                  <div *ngIf="(QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0); else alertMsg">
+                    <div @animation *ngIf="qType=='mcq'">
+                      <app-mcq 
+                      [qusRef]="QuizData.elements[QP].ref" 
+                      [qusData]="QuizData.elements[QP].object" [quizRes]="QuizRes[this.QP]" 
+                      (ansRes)="setAnsRes($event)"></app-mcq>
+                    </div>
+
+                    <div @animation *ngIf="qType=='arrange'" (click)="chkLock()">
+                      <app-arrange *ngIf="qType=='arrange'"
+                      [qusRef]="QuizData.elements[QP].ref" 
+                      [qusData]="QuizData.elements[QP].object" [quizRes]="QuizRes[this.QP]" 
+                      (ansRes)="setAnsRes($event)"></app-arrange>
+                    </div>
+
+                    <div @animation *ngIf="qType=='fillIn'" (click)="chkLock()">
+                      <app-fillin *ngIf="qType=='fillIn'"
+                      [qusRef]="QuizData.elements[QP].ref" 
+                      [qusData]="QuizData.elements[QP].object" [quizRes]="QuizRes[this.QP]" 
+                      (ansRes)="setAnsRes($event)"></app-fillin>
+                    </div>
+
+                    <div @animation *ngIf="qType=='info'">
+                      <app-info *ngIf="qType=='info'"
+                      [qusRef]="QuizData.elements[QP].ref" 
+                      [qusData]="QuizData.elements[QP].object" [quizRes]="QuizRes[this.QP]" 
+                      (ansRes)="setAnsRes($event)"></app-info>
+                    </div>
+
+                    <div @animation *ngIf="qType=='sub'">
+                      <app-subjective *ngIf="qType=='sub'"
+                      [qusRef]="QuizData.elements[QP].ref" 
+                      [qusData]="QuizData.elements[QP].object" [quizRes]="QuizRes[this.QP]" 
+                      [qusResponse] = "QuizData.response.resData[QP]" [lang]="language"  
+                      (ansRes)="setAnsRes($event)"></app-subjective>
+                    </div>
+
+                  </div>
+                  <ng-template #alertMsg>
+                    <h3><app-math [content]="language.text_subsToPro"></app-math></h3>                
+                  </ng-template>
+
+                </div>
+              </div>
+
+              <br>
+              
+              <!-- Hint/Exp/Inst/Feedback/Notes-->
+              <div class="container-fluid">
+                <!-- Notes -->
+                <div class="row" cdkDrag style="position: relative;z-index: 1;" *ngIf="showNotes">
+                  <div class="col-md-12">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="notesToggle()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category">{{language.text_notes}}</h6>
+                        <div class="card-description">
+                          <div style="max-height:300px;overflow-y: scroll;">
+                            <app-math [content]="notes"></app-math>
+                          </div>
+                          <div>
+                            <ckeditor [(ngModel)]="notes" [config]="ckeditorConfig"></ckeditor>
+                          </div>
+                        </div>
+                      </div>                  
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <!-- hint -->
+                  <div class="col-md-12 col-md-6" *ngIf="showHint">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="resetHint()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category text-success">{{language.text_hint}}</h6>
+                        <p class="card-description">
+                          <app-math [content]="QuizData.elements[QP].object.hint"></app-math>
+                        </p>
+                      </div>                  
+                    </div>                
+                  </div>
+
+                  <!-- Exp -->
+                  <div class="col-md-12 col-md-6" *ngIf="showExp">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="resetExp()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category text-primary">{{language.text_explanation}}</h6>
+                        <p class="card-description">
+                          <app-math [content]="QuizData.elements[QP].object.explanation"></app-math></p>
+                      </div>                
+                    </div> 
+                  </div>
+                </div>
+                
+                <!-- Instruction -->
+                <div class="row">
+                  <div class="col-md-12 col-md-6" *ngIf="showInst">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="instToggle()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category">{{language.text_instruction}}</h6>
+                        <div class="card-description">
+                          <app-math [content]="this.QuizMetaData.wsInstr"></app-math>
+                          <table class="table grading-tbl" style="border:#ccc5b8 1px solid;border-radius:5px;">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th class="grd-primary">{{language.text_noHelpUsed}}</th>
+                                <th *ngIf="QuizMetaData.wshelpAllowed>=1"  class="grd-info">{{language.text_hintUsed}}</th>
+                                <th *ngIf="QuizMetaData.wshelpAllowed==2"  class="grd-success">{{language.text_expUsed}}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <th>{{language.text_correctScore}}</th>
+                                <td  class="grd-primary">
+                                  {{QuizMetaData.wsGradingMatrix[0][0]}}
+                                </td>
+                                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                                  {{QuizMetaData.wsGradingMatrix[0][1]}}
+                                </td>
+                                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                                  {{QuizMetaData.wsGradingMatrix[0][2]}}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>{{language.text_skipScore}}</th>
+                                <td  class="grd-primary">
+                                  {{QuizMetaData.wsGradingMatrix[1][0]}}
+                                </td>
+                                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                                  {{QuizMetaData.wsGradingMatrix[1][1]}}
+                                </td>
+                                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                                  {{QuizMetaData.wsGradingMatrix[1][2]}}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>{{language.text_incorrectScore}}</th>
+                                <td  class="grd-primary">
+                                  {{QuizMetaData.wsGradingMatrix[2][0]}}
+                                </td>
+                                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                                  {{QuizMetaData.wsGradingMatrix[2][1]}}
+                                </td>
+                                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                                  {{QuizMetaData.wsGradingMatrix[2][2]}}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>                  
+                    </div>                
+                  </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="row" #Feedback>
+                  <div class="col-md-12" *ngIf="showFeedback">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="feedbackToggle()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category">{{language.text_feedback}}</h6>
+                        <div class="card-description">
+                          <div *ngIf="oldFeedback">
+                            <ul>
+                              <li *ngFor="let item of oldFeedback;"><app-math [content]="item.msg"></app-math></li>
+                            </ul>
+                          </div>
+                          
+                          <div class="row">
+                            <div class="col-md-6">
+                              <!-- <textarea class="form-control" [(ngModel)]="currFeedback" name="currFeedback" id="currFeedback" rows="10"></textarea> -->
+                              <ckeditor [(ngModel)]="currFeedback" [config]="ckeditorConfig"></ckeditor>
+                              
+                            </div>
+                            <div class="col-md-6 feedback-preview">
+                              <h5>{{language.text_preview}}</h5>
+                              <app-math [content]="currFeedback"></app-math>
+                            </div>
+                          </div>
+                          <br>
+                          <button class="btn btn-sm btn-round btn-success" (click)="addFeedback()">{{language.caption_submit}}</button>
+                        </div>
+                      </div>                  
+                    </div>                
+                  </div>
+                </div>
+
+                <!-- Forums -->
+                <div class="row forums-area" #Forum>
+                  <div class="col-md-12" *ngIf="showForum">
+                    <div class="card hint-exp">
+                      <div class="card-body">                    
+                        <div class="pull-right text-muted cursor-pointer" (click)="resetForum()"><i class="fa fa-times" aria-hidden="true"></i></div>
+                        <h6 class="card-category">{{language.text_discussionForum}}</h6>
+                        <div class="card-description">
+                          <div *ngIf="forums">
+                            <div @animationside *ngIf="forumSlideToggle">
+                              <div *ngIf="forums['entries'].length==0; else Queries">
+                                {{language.msg_noQryForForum}}
+                              </div>   
+                              <ng-template #Queries>
+                    
+                                <div class="media-area">
+                                  <div class="media" *ngFor="let query of (forums['entries'] | forum:'question':'none'); let i=index">
+                                    
+                                    <div class="avatar pull-left">
+                                      <img class="media-object" src="{{userImg}}{{query.wbuser}}"/>
+                                    </div>
+                                    
+                                    <div class="media-body pull-right">
+                                      
+                                      <div>
+                                        <span class="media-heading pull-left">{{query.wbuser.split('@')[0]}} <br><small class="text-muted">{{query.timestamp | date}}</small></span>
+                                        <span class="btn btn-info btn-link pull-right "(click)="forumToggle(query)"> <i class="fa fa-reply"></i> {{language.caption_view}}</span>
+                                        <div class="clearfix"></div>
+                                      </div>
+                                      
+                                      <div>
+                                        <p class="text-default"><app-math [content]="query.statement"></app-math></p>
+                                      </div>
+                                      <br>
+                                      <div class="media-footer">
+                                        <a href="javascript:void(0)" class="btn btn-link {{(forums.likes | forum: 'like_status':query.timestamp+'-'+query.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                          <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':query.timestamp+'-'+query.randomId).length}}
+                                        </a>
+                                        <a href="javascript:void(0)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':query.timestamp+'-'+query.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                          <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':query.timestamp+'-'+query.randomId).length}}
+                                        </a>
+                                        <a href="javascript:void(0)" class="btn btn-link">
+                                          {{language.text_views}} &middot; {{(forums.views | forum: 'views':query.timestamp+'-'+query.randomId).length}}
+                                        </a>
+                                      </div>
+                                      
+                                    
+                                      <div class="clearfix"></div>
+                                    </div>
+                                    <hr>
+                                  </div> <!-- end media -->
+                                </div>
+                                
+                              </ng-template> 
+                    
+                              <!-- <ckeditor [(ngModel)]="forumQus" [config]="ckeditorConfig"></ckeditor> -->
+                              <!-- <div class="media-area container">
+                                <div class="media">
+                                  <div class="media-body">
+                                    <div class="avatar pull-left">
+                                      <img class="media-object" src="{{userImg}}{{userProfileData['user']}}"/>
+                                    </div>
+                                    <div class="media media-post">
+                                      <div class="media-body pull-right">
+                                        <div *ngIf="forumQus" style="max-height: 200px; overflow-y:scroll;">
+                                          <span class="font-weight-bold">{{language.text_preview}}</span>
+                                          <p><app-math [content]="forumQus"></app-math></p>
+                                        </div>
+                                        <textarea class="form-control" [(ngModel)]="forumQus" rows="3"></textarea>
+                                        <div class="media-footer">
+                                          <button class="btn btn-sm btn-primary btn-round pull-right" (click)="forumPost('question','none',forumQus)">{{language.caption_askQus}}</button>
+                                        </div>
+                                      </div>
+                                      <div class="clearfix"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div> -->
+
+                              <div class="row">
+                                <div class="col-md-12">
+                                  
+                                  <!-- <img class="img-circle" src="{{userImg}}{{userProfileData['user']}}" width="42"/> 
+                                  <span class="text-default font-weight-bold">&nbsp;&nbsp;&nbsp;{{userProfileData['user'].split('@')[0]}}</span> -->
+                                  <p><b>{{language.text_yourQus}}</b></p>
+                                  <div>
+                                    <div *ngIf="forumQus" style="max-height: 200px; overflow-y:scroll;">
+                                      <span class="font-weight-bold">{{language.text_preview}}</span>
+                                      <p><app-math [content]="forumQus"></app-math></p>
+                                    </div>
+                                    <textarea class="form-control" [(ngModel)]="forumQus" rows="3"></textarea>
+                                    <br>
+                                    <button class="btn btn-sm btn-primary btn-round pull-right" (click)="forumPost('question','none',forumQus)">{{language.caption_askQus}}</button>
+                                  </div>
+                                  
+                                </div>
+                              </div>
+                              
+                            </div> 
+                    
+                            <div @animationside *ngIf="!forumSlideToggle">
+                              <div *ngIf="currForumQry">
+                                
+                                <div class="media-area">
+                                  <div class="media">
+                                    
+                                    <div class="avatar pull-left">
+                                      <img class="media-object" src="{{userImg}}{{currForumQry.wbuser}}"/>
+                                    </div>
+                                    
+                                    <div class="media-body pull-right">
+                                      <div class="forum-qus">
+                                        <div>
+                                          <span class="media-heading pull-left">{{currForumQry.wbuser.split('@')[0]}} <br><small class="text-muted">{{currForumQry.timestamp | date}}</small></span>
+                                          <span class="btn btn-info btn-link pull-right " (click)="forumToggle()"> <i class="fa fa-reply"></i> {{language.caption_back}}</span>
+                                          <div class="clearfix"></div>
+                                        </div>
+                                        
+                                        <div>
+                                          <p class="text-default"><app-math [content]="currForumQry.statement"></app-math></p>
+                                        </div>
+                                        
+                                        <div class="media-footer">
+                                          <span (click)="setLike(currForumQry.timestamp+'-'+currForumQry.randomId,true)" class="btn btn-link {{(forums.likes | forum: 'like_status':currForumQry.timestamp+'-'+currForumQry.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':currForumQry.timestamp+'-'+currForumQry.randomId).length}}
+                                          </span>
+                                          <span (click)="setLike(currForumQry.timestamp+'-'+currForumQry.randomId,false)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':currForumQry.timestamp+'-'+currForumQry.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                            <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':currForumQry.timestamp+'-'+currForumQry.randomId).length}}
+                                          </span>
+                                          <span class="btn btn-link">
+                                            {{language.text_views}} &middot; {{(forums.views | forum: 'views':currForumQry.timestamp+'-'+currForumQry.randomId).length}} 
+                                          </span>
+                                        </div>
+                                      </div>
+                                    
+                                      <div class="clearfix"></div>
+                    
+                                      <!-- Answer -->
+                                      <h6 class="font-weight-bold text-success" *ngIf="(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length>0">
+                                        {{(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length}} {{language.text_answer}}
+                                      </h6>
+                                      <div class="media" *ngFor="let ans of (forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId); let i=index">
+                                        
+                                        <div class="avatar pull-left">
+                                          <img class="media-object" width="30" src="{{userImg}}{{ans.wbuser}}"/>
+                                        </div>
+                                        
+                                        <div class="media-body pull-right">
+                                          <div>
+                                            <span class="media-heading pull-left">{{ans.wbuser.split('@')[0]}}&nbsp;<small class="text-muted">{{ans.timestamp | date}}</small></span>
+                                            
+                                            <div class="clearfix"></div>
+                                          </div>
+                                          
+                                          <div>
+                                            <p class="text-default"><app-math [content]="ans.statement"></app-math></p>
+                                          </div>
+                                          <div class="media-footer">
+                                            <span (click)="setLike(ans.timestamp+'-'+ans.randomId,true)" class="btn btn-link {{(forums.likes | forum: 'like_status':ans.timestamp+'-'+ans.randomId:userProfileData['user']).length!=0? 'btn-primary':''}}">
+                                              <i class="fa fa-thumbs-up" aria-hidden="true"></i> {{(forums.likes | forum: 'like':ans.timestamp+'-'+ans.randomId).length}}
+                                            </span>
+                                            <span (click)="setLike(ans.timestamp+'-'+ans.randomId,false)" class="btn btn-link {{(forums.likes | forum: 'dislike_status':ans.timestamp+'-'+ans.randomId:userProfileData['user']).length!=0? 'btn-danger':''}}">
+                                              <i class="fa fa-thumbs-down" aria-hidden="true"></i> {{(forums.likes | forum: 'dislike':ans.timestamp+'-'+ans.randomId).length}}
+                                            </span>
+                                          </div>
+
+                                          <!-- Comment -->
+                                          <h6 class="font-weight-bold text-success" *ngIf="(forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId).length>0">
+                                            {{(forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId).length}} {{language.text_comment}}
+                                          </h6>
+                                          <div *ngFor="let cmnt of (forums['entries'] | forum:'comment':ans.timestamp+'-'+ans.randomId); let i=index">
+                                              <small class="text-default">
+                                                <app-math [content]="cmnt.statement"></app-math> 
+                                                - <span class="text-primary">{{cmnt.wbuser.split('@')[0]}} <span class="text-muted">{{cmnt.timestamp | date}}</span></span>
+                                              </small>
+                                              <hr>
+                                          </div>
+                                          
+                                          <div class="row">
+                                            <div class="col-md-12">
+                                              <div class="tabs">
+                                                <div class="tab">
+                                                  <input type="checkbox" id="chck{{i}}">
+                                                  <label class="tab-label text-muted" for="chck{{i}}">{{language.text_addComment}}</label>
+                                                  <div class="tab-content">
+                                                      <textarea [(ngModel)]="forumComment[i]" rows="2" name="comment_{{i}}" id="comment_{{i}}" class="form-control input-sm"></textarea>
+                                                      <br>
+                                                      <div align="right">
+                                                        <button class="btn btn-sm"  (click)="forumPost('comment',ans.timestamp+'-'+ans.randomId,forumComment[i],currForumQry.timestamp+'-'+currForumQry.randomId)">{{language.text_comment}}</button>
+                                                      </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        
+                                          <div class="clearfix"></div>
+                                        </div>
+                                      </div> <!-- end media answer -->
+                    
+                                    </div>
+                                    <hr>
+                                  </div> <!-- end media -->
+                                  <br>
+                                </div>
+                                
+                                <div>
+                                  <p><b>{{language.text_yourAns}}</b></p>
+                                  <!-- <ckeditor [(ngModel)]="forumAns" [config]="ckeditorConfig"></ckeditor><br> -->
+                                  <textarea [(ngModel)]="forumAns" class="form-control"></textarea>
+                                  <br>
+                                  <div class="pull-right"><button class="btn btn-sm btn-primary btn-round"  (click)="forumPost('answer',currForumQry.timestamp+'-'+currForumQry.randomId,forumAns,currForumQry.timestamp+'-'+currForumQry.randomId)">{{language.caption_postAns}}</button></div>
+                                </div>
+                              </div>
+                            </div>
+                    
+                          </div>
+                        </div>
+                      </div>                  
+                    </div>                
+                  </div>
+                </div>
+                  
+              </div>
+
+          </div>
+
+          <!-- side -->
+          <div class="col-md-3 side-bar fixed-sidebar">        
+            <!-- Numbers grid -->
+            <div class="card">
+              <div class="card-body">            
+                <div class="container-fluid">
+                  
+                  <div style="margin-left: -15px; margin-right: -15px;">
+                   
+                    <span class="pull-right">
+                      <nav class="navbar pull-right">
+                        <div ngbDropdown class="dropdown">
+                          <div ngbDropdownToggle class="text-danger"><i class="fa fa-cog" aria-hidden="true"></i></div>
+                          <div ngbDropdownMenu class="dropdown-menu-right">
+                            <a class="dropdown-item" (click)="open(Instructions,'xl')">{{language.text_instruction}}</a>
+                            <a *ngIf="!isReview && wsAccess==-1" class="dropdown-item" (click)="submitModel(Smodel);">{{language.caption_submit}}</a>
+                            <a *ngIf="!isReview && wsAccess==-1" class="dropdown-item" (click)="saveRespData('save')">{{language.caption_save}}</a>
+                            <a class="dropdown-item" (click)="exitQuiz()">{{language.caption_exit}}</a>
+                          </div>
+                        </div>
+                      </nav>
+                    </span>
+                    <span class="text-muted">
+                      <img class="img-circle forum-avtar" src="{{userImg}}{{userProfileData['user']}}" alt="{{userProfileData.name}}" width="40">&nbsp;&nbsp;
+                      <b>{{userProfileData.user.split('@')[0]}}</b><br/>
+                    </span>
+                  </div>
+                  <div class="clearfix"></div>
+                  
+                  <br>
+                  <div class="row">
+                    <div *ngFor="let qn of quizGridElements;" 
+                    class="col-md-4 txt-c-align qn-grid {{QP==qn? 'bg-info':QuizRes[qn].lock==true? 'bg-success':''}}" (click)="jumpTo(qn)">
+                      {{qn+1}}<small><i *ngIf="QuizRes[qn].review==1" class="fa fa-flag"></i></small>
+                    </div>
+                  </div>      
+                </div>
+                <div *ngIf="(QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0)">
+                  <small>{{QP+1}} of {{quizElements.length}}</small>
+                  <span class="pull-right" title="{{language.title_allItems}}" (click)="allContent(AllContent)"><i class="fa fa-bars" aria-hidden="true"></i></span>
+                </div>
+                <br>
+
+                <table class="qus-matrix table table-bordered" *ngIf="(QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0)">
+                  <tr *ngIf="!isReview">
+                    <td width="87" align="center" class="cursor-pointer {{QuizRes[QP].review==1? 'bg-danger':''}}" (click)="setFlag()">{{language.caption_flag}}</td>
+                    <td width="87" align="center" class="cursor-pointer {{QuizRes[QP].lock==true? 'bg-success':''}}" (click)="setLock()">
+                      <span *ngIf="qType!='info'">{{QuizRes[QP].lock==true? language.caption_unlock:language.caption_lock}}</span>
+                      <span *ngIf="qType=='info'">{{QuizRes[QP].lock==true? language.caption_unread:language.caption_read}}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="qType!='info'">
+                    <td *ngIf="(currWbData['type']!='free' && wshelpAllowed==1) || (currWbData['type']=='free' && QuizData.elements[QP].access==1 && wshelpAllowed==1 )" colspan="2" align="center" class="cursor-pointer {{QuizRes[QP].helpUsed>=1? 'bg-warning':''}}" (click)="setHint()">{{language.text_hint}}</td>
+                    <td *ngIf="(currWbData['type']!='free' && wshelpAllowed==2) || (currWbData['type']=='free' && QuizData.elements[QP].access>=1 && wshelpAllowed==2 )" align="center" class="cursor-pointer {{QuizRes[QP].helpUsed>=1? 'bg-warning':''}}" (click)="setHint()">{{language.text_hint}}</td>
+                    <td *ngIf="(currWbData['type']!='free' && wshelpAllowed==2) || (currWbData['type']=='free' && QuizData.elements[QP].access==2 && wshelpAllowed==2 )" align="center" class="cursor-pointer {{QuizRes[QP].helpUsed==2? 'bg-warning':''}}" (click)="setExp()">{{language.text_explanation}}</td>
+                  </tr>
+                </table>
+
+                <table class="table table-bordered">
+                  <tr *ngIf="currWbData.quizMode=='lesson'&&isReview==false && qType!='info'">
+                    <td align="center" class="cursor-pointer {{QuizRes[QP].checkAns? 'text-success':''}}"  (click)="chkAns(Notice);"><i *ngIf="QuizRes[QP].checkAns" class="fa fa-check-circle-o" aria-hidden="true"></i>&nbsp;{{language.caption_chkAns}}</td>
+                    <!-- <td align="center" class="cursor-pointer" (click)="showAns()">{{language.caption_showAns}}</td> -->
+                  </tr>
+
+                  <tr *ngIf="currWbData['type']=='beta'">
+                    <td align="center" class="cursor-pointer" (click)="feedbackToggle(Feedback)"><i class="fa fa-commenting" aria-hidden="true"></i> {{language.text_feedback}}</td>
+                  </tr>
+                  
+                  <tr *ngIf="currWbData['type']!='beta' && (QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0)">
+                    <td align="center" class="cursor-pointer" (click)="notesToggle()"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> {{language.text_notes}}</td>
+                  </tr>
+
+                  <tr *ngIf="currWbData.quizMode!='quiz' || isReview==true">
+                    <td align="center" class="cursor-pointer" (click)="forumsStart(Forum)"><i class="fa fa-comments-o" aria-hidden="true"></i> Forum</td>
+                  </tr>
+                </table>
+
+                <div align="center">
+                  <button *ngIf="wsAccess>-1" class="btn btn-round btn-primary" (click)="subToPro()">Subscribe to PRO</button>
+                </div>
+
+                <div *ngIf="isReview==true && qType!='info' && qType!='sub'">
+                  <div class="card" data-color="green" data-background="color">
+                    <div class="card-body text-center">
+                      <h6 class="card-category">
+                        <!-- <i class="fa fa-dribbble" aria-hidden="true"></i>  -->{{language.text_correctAns}}
+                      </h6>
+                      <h5 class="card-title">
+                        <!-- <a href="javascript:void(0)">"Good Design Is as Little Design as Possible"</a> -->
+                      </h5>
+                      <div class="card-description font-weight-bold" align="left">
+                        <app-math [content]="QuizData.response.resData[QP].correctAns"></app-math>
+                      </div>
+                      <!-- <div class="card-footer text-center">
+                        <a href="javascript:void(0)" ngbTooltip="Bookmark" class="btn btn-outline-neutral btn-round btn-just-icon"><i class="fa fa-bookmark-o"></i></a>
+                        <a href="javascript:void(0)" class="btn btn-neutral btn-round"><i class="fa fa-newspaper-o"></i> Read</a>
+                      </div> -->
+                    </div>
+                  </div>
+                </div>
+                <!-- Sub Self Grading -->
+                <br>
+                <div *ngIf="isReview==true && qType=='sub' && QuizData.response.resData[this.QP]['lock']==true">
+                  <div *ngIf="QuizData.response.resData[this.QP]['graded']; else SelfGrade">
+                      <p class="font-weight-bold text-success">{{language.text_score}} : {{QuizData.response.resData[this.QP]['score']}}</p>
+                  </div>
+                  <ng-template #SelfGrade>
+                      <p class="font-weight-bold text-default">{{language.text_gradeSubAns}}</p>
+                      <br>
+                      <div class="d-flex">
+                        <span class="font-weight-bold mr-2">0</span>
+                        <form class="range-field w-55">
+                          <input class="custom-range" [(ngModel)]="subjectiveGrd" name="subGrd" id="subGrd" type="range" min="0" max="{{QuizData.response.resData[QP].score}}" step="{{QuizData.response.resData[QP].score/10}}"/>
+                        </form>
+                        <span class="font-weight-bold ml-2">{{QuizData.response.resData[QP].score}}</span>
+                      </div>
+                      <br>
+                      <div>
+                        <button class="pull-right btn btn-sm btn-primary btn-round" (click)="subGrade()">{{language.text_grade}}</button>
+                        <span class="pull-left font-weight-bold text-default">{{language.text_score}}: {{subjectiveGrd}}</span>
+                      </div>
+                  </ng-template>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div> 
+
+    <!-- Models -->
+    <ng-template #Notice let-c="close" let-d="dismiss">
+        <div class="modal-header">
+            <h5 class="modal-title">{{language.text_answerStatus}}</h5>
+            <button type="button" class="close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" *ngIf="score"> 
+            <div class="instruction">
+                <p>{{language.text_youHaveScored}} : {{score.score}}</p>
+                <!-- <p>{{language.text_grade}} : {{gradingMatrix[score.gmIndex[0]][score.gmIndex[1]]}}</p> -->
+                <p>{{language.text_correctAnsIs}} : <app-math [content]="score.correctAns"></app-math></p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.caption_close}}</button>
+        </div>
+    </ng-template>
+
+    <ng-template #Smodel let-c="close" let-d="dismiss">
+        <div class="modal-header" *ngIf="isReview == false">
+            <h5 class="modal-title text-center">{{language.text_submitResp}}</h5>
+            <button type="button" class="close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" *ngIf="isReview == false">
+
+          <div>
+            <!--  *ngFor="let item of QuizData.elements; let i=index" -->
+            <button type="button" *ngFor="let item of QuizData.elements; let i=index" 
+              class="btn {{QuizRes[i].lock==true? 'btn-outline-success':i==QP? 'btn-outline-primary':'btn-outline-default'}} btn-just-icon mr-1" (click)="jumpTo(i);d('Cross click');">
+              <span class="{{QuizRes[i].review==1? 'text-danger':''}}">{{i+1}}</span>
+            </button>
+          </div>
+          <br><br>
+
+          <table width="100%">
+            <tr>
+              <td><h5>{{language.text_totalNoQus}}</h5></td><td align="right"><h5>{{QuizData.elements.length}}</h5></td>
+            </tr>
+            <tr>
+              <td><h5>{{language.text_attemptedQus}}</h5></td><td align="right"><h5>{{showSummary.attempted}}</h5></td>
+            </tr>
+            <tr>
+              <td><h5>{{language.text_skippedQus}}</h5></td><td align="right"><h5>{{showSummary.skipped}}</h5></td>
+            </tr>
+            <tr>
+              <td><h5>{{language.text_flaggedQus}}</h5></td><td align="right"><h5>{{showSummary.flagged}}</h5></td>
+            </tr>
+            <tr>
+              <td><h5>{{language.text_timeUsed}}</h5></td>
+              <td align="right"><h5 *ngIf="quizClock">
+                {{quizClock.hh<10? '0'+quizClock.hh: quizClock.hh}}:{{quizClock.mm<10? '0'+quizClock.mm: quizClock.mm}}:{{quizClock.ss<10? '0'+quizClock.ss: quizClock.ss}}
+              </h5></td>
+            </tr>
+          </table>
+        </div>
+        <div class="modal-footer" *ngIf="isReview == false">
+            <div class="left-side">
+                <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.caption_notNow}}</button>
+            </div>
+            <div class="divider"></div>
+            <div class="right-side">
+                <button type="button" class="btn btn-success btn-link" (click)="submitResp('submit');c('')">{{language.caption_submit}}</button>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #CorrectAns let-c="close" let-d="dismiss">
+      <div class="modal-header">
+          <h5 class="modal-title font-weight-bold">{{language.text_correctAns}}</h5>
+          <button type="button" class="close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body"> 
+          <div class="instruction font-weight-bold" *ngIf="isReview==true">
+            <!-- <app-math [content]="QuizData.answers[QuizData.elements[QP].ref].correctAns"></app-math> -->
+            <app-math [content]="QuizData.response.resData[QP].correctAns"></app-math>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.caption_close}}</button>
+      </div>
+    </ng-template>
+
+    <ng-template #LearnHowTo let-c="close" let-d="dismiss">
+      <div class="modal-header">
+          <h5 class="modal-title">{{language.text_learnHowTo}}</h5>
+          <button type="button" class="close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <div class="instruction">
+            <div *ngIf="qType=='mcq'">
+              <p><app-math [content]="language.msg_learnMcq"></app-math></p>
+            </div>
+            <div *ngIf="qType=='arrange'">
+              <p><app-math [content]="language.msg_learnArrange"></app-math></p>
+            </div>
+            <div *ngIf="qType=='fillIn'">
+              <p><app-math [content]="language.msg_learnFillin"></app-math></p>
+            </div>
+            <div *ngIf="qType=='info'">
+              <p><app-math [content]="language.msg_learnInfo"></app-math></p>
+            </div>
+            <div *ngIf="qType=='sub'">
+              <p><app-math [content]="language.msg_learnSub"></app-math></p>
+            </div>
+        </div>      
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.text_done}}</button>
+      </div>
+    </ng-template>
+
+    <ng-template #UserActivity let-c="close" let-d="dismiss">
+      <!-- <div class="modal-header">
+          <h5 class="modal-title">{{language.text_learnHowTo}}</h5>
+          <button type="button" class="close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div> -->
+      <div class="modal-body user-activity">
+        <div class="instruction" *ngIf="!isActive">
+          <h6>{{language.msg_userInactivity}} <span class="text-danger">{{activityCount}}</span></h6>
+        </div>      
+        <div class="instruction" *ngIf="isActive" align="center">
+          <h4 class="text-success"><i class="fa fa-thumbs-up" aria-hidden="true"></i> &nbsp;&nbsp;<span class="success">{{language.text_youAreActive}}</span></h4>
+          <br>
+        </div> 
+      </div>
+      <div class="modal-footer" *ngIf="!isActive">
+          <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.text_pressAnyKey}} {{language.text_or}} {{language.caption_click}}</button>
+      </div>
+    </ng-template>
+
+    <ng-template class="all-items" #AllContent let-c="close" let-d="dismiss">
+      <div class="modal-header">
+          <!-- <h5 class="modal-title">{{language.text_learnHowTo}}</h5> -->
+          <button type="button" class="close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <div class="instruction" *ngFor="let item of QuizData.elements; let i=index">
+            <div class="all-items" (click)="jumpTo(i);d('Cross click');">
+              <span>
+                <h6 class="font-weight-bold">
+                  <span  class="text-primary mr-2">
+                    {{i+1}}. <span class="qus-type">{{item.type=='info' && (item.access==true||item.access>=0)? item.object.style:item.type}}</span>
+                  </span>&nbsp;&nbsp;
+                  <span *ngIf="QuizRes[i].review==1" class="text-danger mr-2"><i class="fa fa-flag mr-2"></i></span>
+                  <span *ngIf="QuizRes[i].lock==true"  class="text-success"><i class="fa fa-lock" aria-hidden="true"></i></span>
+                  
+                </h6>             
+              </span>
+              <div *ngIf="(item.access==true || item.access>=0); else alertMsgAllItem">
+                <p *ngIf="item.type=='mcq'||item.type=='arrange'||item.type=='fillIn'||item.type=='sub'"><app-math [content]="item.object.question"></app-math></p>
+                <p *ngIf="item.type=='info'" class="font-weight-bold">{{item.object.style}}</p>
+              </div>
+              <ng-template #alertMsgAllItem>
+                <h3><app-math [content]="language.text_subsToPro"></app-math></h3>                
+              </ng-template>
+            </div>
+            <hr>
+        </div>      
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-link" (click)="c('Close click')">{{language.text_done}}</button>
+      </div>
+    </ng-template>
+
+    <ng-template #Instructions let-c="close" let-d="dismiss">
+      <div class="modal-header">
+          <h5 class="modal-title">{{language.text_instruction}}</h5>
+          <button type="button" class="close" (click)="d('Cross click')">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <app-math [content]="this.QuizMetaData.wsInstr"></app-math>
+          <table class="table grading-tbl" style="border:#ccc5b8 1px solid;border-radius:5px;">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="grd-primary">{{language.text_noHelpUsed}}</th>
+                <th *ngIf="QuizMetaData.wshelpAllowed>=1"  class="grd-info">{{language.text_hintUsed}}</th>
+                <th *ngIf="QuizMetaData.wshelpAllowed==2"  class="grd-success">{{language.text_expUsed}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>{{language.text_correctScore}}</th>
+                <td  class="grd-primary">
+                  {{QuizMetaData.wsGradingMatrix[0][0]}}
+                </td>
+                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                  {{QuizMetaData.wsGradingMatrix[0][1]}}
+                </td>
+                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                  {{QuizMetaData.wsGradingMatrix[0][2]}}
+                </td>
+              </tr>
+              <tr>
+                <th>{{language.text_skipScore}}</th>
+                <td  class="grd-primary">
+                  {{QuizMetaData.wsGradingMatrix[1][0]}}
+                </td>
+                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                  {{QuizMetaData.wsGradingMatrix[1][1]}}
+                </td>
+                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                  {{QuizMetaData.wsGradingMatrix[1][2]}}
+                </td>
+              </tr>
+              <tr>
+                <th>{{language.text_incorrectScore}}</th>
+                <td  class="grd-primary">
+                  {{QuizMetaData.wsGradingMatrix[2][0]}}
+                </td>
+                <td  class="grd-info" *ngIf="QuizMetaData.wshelpAllowed>=1">
+                  {{QuizMetaData.wsGradingMatrix[2][1]}}
+                </td>
+                <td  class="grd-success" *ngIf="QuizMetaData.wshelpAllowed==2">
+                  {{QuizMetaData.wsGradingMatrix[2][2]}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>     
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger btn-link" (click)="c('Close click')">{{language.text_done}}</button>
+      </div>
+    </ng-template>
+
+
+
+    <!-- For mobile -->
+    <div id="bottom-nav" class="bottom-menu">
+      <div class="container-fluid">
+        <div class="row"> 
+          <div class="col-md-6 col-sm-6" align="center">  
+            <div>
+            
+              <!-- Hint -->
+              <button *ngIf="(QuizData.elements[QP].access==true && qType!='info' && wshelpAllowed>=1) || (currWbData['type']=='free' && qType!='info' && QuizData.elements[QP].access>=1 && wshelpAllowed>=1 )" 
+                class="btn {{QuizRes[QP].helpUsed>=1? 'btn-warning':'btn-outline-default'}} btn-just-icon mr-1" (click)="setHint()">
+                  <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+              </button>  
+              <!-- Explation -->
+              <button *ngIf="(QuizData.elements[QP].access==true && qType!='info' && wshelpAllowed==2) || (currWbData['type']=='free' && qType!='info' && QuizData.elements[QP].access==2 && wshelpAllowed==2 )" 
+                class="btn {{QuizRes[QP].helpUsed==2? 'btn-warning':'btn-outline-default'}} btn-just-icon mr-1" (click)="setExp()">
+                <!-- <i *ngIf="QuizRes[QP].helpUsed<2" class="fa fa-book" aria-hidden="true"></i> 
+                <i *ngIf="QuizRes[QP].helpUsed==2" class="fas fa-book-open"></i> -->
+                <i class="fa fa-book" aria-hidden="true"></i>
+              </button>   
+              <!-- Instruction -->
+              <button class="btn btn-outline-default btn-just-icon mr-1" (click)="instToggle()">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+              </button>
+              <!-- feedback -->
+              <button *ngIf="currWbData['type']=='beta'" class="btn btn-outline-default btn-just-icon mr-1" (click)="feedbackToggle()">
+                <i class="fa fa-commenting" aria-hidden="true"></i>
+              </button>
+              <!-- Forums -->
+              <button *ngIf="currWbData.quizMode!='quiz' || isReview==true" class="btn btn-outline-default btn-just-icon mr-1" (click)="forumsStart(Forum)">
+                <i class="fa fa-comments-o" aria-hidden="true"></i>
+              </button>
+
+              <!-- Notes -->
+              <button  *ngIf="currWbData['type']!='beta' && (QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0)" class="btn btn-outline-default btn-just-icon mr-1" (click)="notesToggle()"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+             
+              <!-- Save -->
+              <button class="btn btn-outline-default btn-just-icon mr-1" *ngIf="(QuizData.elements[QP].access==true || QuizData.elements[QP].access>=0) && !isReview" (click)="saveRespData('save')"><i class="fa fa-upload" aria-hidden="true"></i></button>
+              <!-- Submit -->
+              <button *ngIf="!isReview" class="btn btn-outline-default btn-just-icon mr-1" (click)="submitModel(Smodel);"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+              <!-- Exit -->
+              <button class="btn btn-outline-default btn-just-icon mr-1" class="btn btn-outline-default btn-just-icon mr-1" (click)="exitQuiz()">
+                <i class="fa fa-sign-out" aria-hidden="true"></i>
+              </button>
+
+              
+            </div>
+            <div *ngIf="currWbData.quizMode=='lesson'&&isReview==false">
+                <button class="btn btn-link {{QuizRes[QP].checkAns? 'btn-success':'btn-default'}} mr-1" (click)="chkAns(Notice);">
+                  <i *ngIf="QuizRes[QP].checkAns" class="fa fa-check-circle-o" aria-hidden="true"></i>&nbsp;Check Answer
+                </button>
+            </div>
+          </div>
+          <!--  -->
+          <div class="col-md-6 col-sm-6 bottom-grid">
+            <div class="row">
+              <div *ngFor="let qn of quizGridElements;" 
+              class="col-md-4 col-xs-4 txt-c-align qn-grid {{QP==qn? 'bg-info':QuizRes[qn].lock==true? 'bg-success':''}}" (click)="jumpTo(qn)">
+                {{qn+1}}<small><i *ngIf="QuizRes[qn].review==1" class="fa fa-flag"></i></small>
+              </div>
+            </div>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">  
+      <table width="100%">
+        <tr>  
+          <td width="30%" cellpadding="0" valign="top" class="bottom-bar-btn" *ngIf="isReview==true">
+            <button *ngIf="qType!='info'" class="btn btn-success btn-link" type="button" (click)="showCorrectAns(CorrectAns)">
+              {{language.text_correctAns}}
+            </button>
+          </td>   
+          <td valign="top" class="bottom-bar-btn"  *ngIf="!isReview">        
+            <button class="btn {{QuizRes[QP].lock? 'btn-success':'btn-outline-default'}} btn-just-icon mr-1" type="button" (click)="setLock()">
+              <i *ngIf="QuizRes[QP].lock" class="fa fa-lock" aria-hidden="true"></i>            
+              <i *ngIf="!QuizRes[QP].lock" class="fa fa-unlock-alt" aria-hidden="true"></i>
+            </button> 
+            <button class="btn {{QuizRes[QP].review!=0? 'btn-danger':'btn-outline-default'}} btn-just-icon mr-1" type="button" (click)="setFlag()">
+                <i class="fa fa-flag" aria-hidden="true"></i>
+            </button>
+          </td>
+
+          <td class="bottom-mid-section">
+            <p><img src="assets/img/slide-up.png" height="12" (click)="bottomNavToggle()"></p>
+            
+            <a class="btn btn-link btn-default txt-upercase" href="javascript:void(0)">            
+              {{QP+1}} {{language.text_of}} {{quizElements.length}} ({{QuizData.elements[QP].type}})
+            </a>
+          </td>
+
+          <td valign="top" class="bottom-bar-btn">
+            <div class="pull-right">
+              <button class="btn btn-just-icon mr-1" [disabled]="QP==0" (click)="prev()">
+                <b><i class="nc-icon nc-minimal-left"></i></b> 
+              </button>
+              <span class="mr-1"></span>
+              <button class="btn btn-just-icon" [disabled]="QP==QuizData.elements.length-1" (click)="next()">
+                <b><i class="nc-icon nc-minimal-right"></i></b>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+      
+    </div>
+
+    <!-- Forums -->
+    <ng-template #Forums let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h5 class="modal-title">{{language.text_Forum}}Forum</h5>
+        <button type="button" class="close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="forums">
+        <div @animationside *ngIf="forumSlideToggle">
+          <div *ngIf="forums['entries'].length==0; else Queries">
+            There is no any query for this question.
+          </div>   
+          <ng-template #Queries>
+
+            <div class="media-area">
+              <div class="media" *ngFor="let query of (forums['entries'] | forum:'question':'none'); let i=index">
+                
+                <div class="avatar pull-left">
+                  <img class="media-object" src="https://api.adorable.io/avatars/30/{{query.wbuser.split('@')[0]}}.png"/>
+                </div>
+                
+                <div class="media-body pull-right">
+                  
+                  <div>
+                    <span class="media-heading pull-left">{{query.wbuser.split('@')[0]}} <br><small class="text-muted">{{query.timestamp | date}}</small></span>
+                    <span class="btn btn-info btn-link pull-right "(click)="forumToggle(query)"> <i class="fa fa-reply"></i> Reply</span>
+                    <div class="clearfix"></div>
+                  </div>
+                  
+                  <div>
+                    <p><app-math [content]="query.statement"></app-math></p>
+                  </div>
+                  
+                  <div class="media-footer">
+                    <a href="javascript:void(0)" class="btn btn-danger btn-link">
+                      <i class="fa fa-thumbs-up" aria-hidden="true"></i> 243
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-link">
+                      <i class="fa fa-thumbs-down" aria-hidden="true"></i> 2
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-link">
+                      Views &middot; 321
+                    </a>
+                  </div>
+                  
+                
+                  <div class="clearfix"></div>
+                </div>
+                <hr>
+              </div> <!-- end media -->
+            </div>
+            
+          </ng-template> 
+
+          <!-- <ckeditor [(ngModel)]="forumQus" [config]="ckeditorConfig"></ckeditor> -->
+          <div class="media-area">
+            <div class="media">
+              <div class="media-body">
+                <div class="media media-post">
+                  <a class="pull-left author" href="javascript:void(0)">
+                    <div class="avatar">
+                      <img class="media-object" alt="64x64" src="assets/img/faces/kaci-baum-2.jpg">
+                    </div>
+                  </a>
+                  <div class="media-body pull-right">
+                    <textarea class="form-control" [(ngModel)]="forumQus" rows="3"></textarea>
+                    <div class="media-footer">
+                      <button class="btn btn-sm btn-primary btn-round pull-right" (click)="forumPost('question','none',forumQus)">Ask Question</button>
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                </div> <!-- end media-post -->
+              </div>
+            </div>
+          </div>
+         
+        </div> 
+
+        <div @animationside *ngIf="!forumSlideToggle">
+          <div *ngIf="currForumQry">
+            
+            <div class="media-area">
+              <div class="media">
+                
+                <div class="avatar pull-left">
+                  <img class="media-object" src="https://api.adorable.io/avatars/30/{{currForumQry.wbuser.split('@')[0]}}.png"/>
+                </div>
+                
+                <div class="media-body pull-right">
+                  
+                  <div>
+                    <span class="media-heading pull-left">{{currForumQry.wbuser.split('@')[0]}} <br><small class="text-muted">{{currForumQry.timestamp | date}}</small></span>
+                    <span class="btn btn-info btn-link pull-right " (click)="forumToggle()"> <i class="fa fa-reply"></i> Back</span>
+                    <div class="clearfix"></div>
+                  </div>
+                  
+                  <div>
+                    <p><app-math [content]="currForumQry.statement"></app-math></p>
+                  </div>
+                  
+                  <div class="media-footer">
+                    <a href="javascript:void(0)" class="btn btn-danger btn-link">
+                      <i class="fa fa-thumbs-up" aria-hidden="true"></i> 243
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-link">
+                      <i class="fa fa-thumbs-down" aria-hidden="true"></i> 2
+                    </a>
+                    <a href="javascript:void(0)" class="btn btn-link">
+                      Views &middot; 321
+                    </a>
+                  </div>
+                  
+                
+                  <div class="clearfix"></div>
+
+                  <!-- Answer -->
+                  <h6 class="font-weight-bold text-success" *ngIf="(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length>0">
+                    {{(forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId).length}} Answer
+                  </h6>
+                  <div class="media" *ngFor="let ans of (forums['entries'] | forum:'answer':currForumQry.timestamp+'-'+currForumQry.randomId); let i=index">
+                    
+                    <div class="avatar pull-left">
+                      <img class="media-object" width="30" src="https://api.adorable.io/avatars/20/{{ans.wbuser.split('@')[0]}}.png"/>
+                    </div>
+                    
+                    <div class="media-body pull-right">
+                      <div>
+                        <span class="media-heading pull-left">{{ans.wbuser.split('@')[0]}} <br><small class="text-muted">{{ans.timestamp | date}}</small></span>
+                        
+                        <div class="clearfix"></div>
+                      </div>
+                      
+                      <div>
+                        <p><app-math [content]="ans.statement"></app-math></p>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="tabs">
+                            <div class="tab">
+                              <input type="checkbox" id="chck{{i}}">
+                              <label class="tab-label text-muted" for="chck{{i}}">Add Comment</label>
+                              <div class="tab-content">
+                                  <textarea [(ngModel)]="forumComment[i]" rows="2" name="comment_{{i}}" id="comment_{{i}}" class="form-control input-sm"></textarea>
+                                  <br>
+                                  <div align="right">
+                                    <button class="btn btn-sm" (click)="addcomment(i)">Comment</button>
+                                  </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    
+                      <div class="clearfix"></div>
+                    </div>
+                  </div> <!-- end media answer -->
+
+                </div>
+                <hr>
+              </div> <!-- end media -->
+              <br>
+            </div>
+            
+            <div>
+              <p><b>Your Answer</b></p>
+              <!-- <ckeditor [(ngModel)]="forumAns" [config]="ckeditorConfig"></ckeditor><br> -->
+              <textarea [(ngModel)]="forumAns" class="form-control"></textarea>
+              <div class="pull-right"><button class="btn btn-sm btn-primary btn-round"  (click)="forumPost('answer',currForumQry.timestamp+'-'+currForumQry.randomId,forumAns)">Post Your Answer</button></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </ng-template>
+
+</div>

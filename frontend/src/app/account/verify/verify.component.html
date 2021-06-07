@@ -1,0 +1,28 @@
+<div class="section section-transparent" *ngIf="language">
+    <div class="container">
+        <!-- Account verification 
+
+        {{response}} -->
+        <div class="row">
+            <div class="col-md-5 col-sm-6 ml-auto mr-auto">
+                
+                <div class="card card-pricing" *ngIf="verification">
+                    <div class="card-body">
+                        <h6 class="card-category">{{language.text_examineerWorkbook}}</h6>
+                        <h3 class="card-title"><i class="fa fa-check text-success" aria-hidden="true"></i> {{language.text_congratulation}}</h3>
+                        <br>
+                        <p><b>{{language.text_dear}} {{userEmail}}</b></p>
+                        <p>{{language.msg_veryficationDone}}</p>
+                        <br>
+                        <a href="javascript:void(0)" class="btn btn-success btn-round card-link" [routerLink]="['/account/login']">{{language.caption_getStarted}}</a>
+                    </div>
+                </div>
+
+                <div class="card" *ngIf="!verification">
+                    <h3 class="card-title-warning">{{response}}</h3>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

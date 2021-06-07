@@ -1,0 +1,71 @@
+<br>
+<!-- For Flash Card -->
+<div class="qus-txt">
+  <h6><app-math [content]="QusData.header"></app-math></h6>
+</div>
+<br>
+
+
+<div class="qus-txt" *ngIf="QusData.style=='Flash Card'">
+    <div class="row" *ngFor="let item of QusData.sections; let i=index">
+
+        <div class="col-md-6 mr-auto ml-auto">            
+            <div class="card card-blog" *ngIf="i%2==0">
+                <div class="card-body">
+                    <div class="info-slider">
+<!--   
+                        <button (click)="scrollTo('slide-1',i)">Front</button>
+                        <button (click)="scrollTo('slide-2',i)">Back</button> -->
+                      
+                        <div class="slides">
+                          <div class="slide-a" id="slide-1{{i}}">
+                            <div class="content">
+                                <p><app-math [content]="QusData.sections[i]"></app-math></p>                                
+                            </div>
+                          </div>
+                          <div class="slide-b" id="slide-2{{i}}">
+                            <div class="content">
+                                <p><app-math [content]="QusData.sections[i+1]"></app-math></p>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+
+    </div>    
+</div>
+
+<div *ngIf="QusData.style=='Question Answer Pair'">
+    
+    <div class="tabs" *ngIf="language">
+        <div class="tab">
+            <input type="checkbox" class="tab-input" id="revealAns">
+            <label class="tab-label btn btn-sm btn-primary btn-round pull-right" for="revealAns">{{language.caption_revealAns}}</label>
+            <div class="clearfix"></div>
+            <div class="tab-content">
+                <div *ngFor="let item of QusData.sections; let i=index">
+                    <app-math [content]="item"></app-math>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="QusData.style!='Flash Card' && QusData.style!='Question Answer Pair'">
+    <div class="row">
+
+        <div class="col-md-12" *ngFor="let item of QusData.sections; let i=index">
+            <article>
+                <app-math [content]="item"></app-math>
+            </article>
+            <br>
+        </div>
+
+    </div>  
+</div>
+
+
+
